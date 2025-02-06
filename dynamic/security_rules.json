@@ -51,7 +51,8 @@
             "ngrok.io",
             "gist.github.com",
             "paste.ee",
-            "hastebin.com"
+            "hastebin.com",
+            "www.useblackbox.io"
         ],
         "max_concurrent_connections": 10,
         "allowed_domains": [
