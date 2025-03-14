@@ -1,8 +1,31 @@
-sudo userdel vscext
-sudo rm -rf /home/vscext/
+#!/bin/bash
 
+set -x
+
+# Remove the user if it exists
+sudo userdel -r vscext 2>/dev/null
+
+# Create the user
 sudo useradd -m -s /bin/bash vscext
+
+# Set permissions for the extensions directory
+sudo mkdir -p /home/amir/.vscode/extensions
+#sudo chown -R vscext:vscext /home/amir/.vscode/
+sudo setfacl -d -m u:vscext:rwx /home/amir/.vscode/
+#sudo usermod -aG amir vscext
+setfacl -m u:vscext:rwx /home/amir
+
+# Allow the new user to access the display
 xhost +SI:localuser:vscext
-echo ''
+
 echo "Succeed create user"
-sudo -u vscext /bin/bash
+echo "Start set privileges"
+echo "Privileges were changed"
+
+sudo mkdir -p /home/vscext/asd
+sudo cp /home/amir/Загрузки/code-stable-x64-1741787903.tar.gz /home/vscext/asd/
+sudo tar -xzvf /home/vscext/asd/code-stable-x64-1741787903.tar.gz -C /home/vscext/asd/
+# Run VSCode as the new user
+sudo -u vscext /home/vscext/asd/VSCode-linux-x64/./code --extensions-dir /home/`whoami`/.vscode/extensions/
+
+sudo iptables -I OUTPUT -m owner --uid-owner `id -u vscext` -j LOG --log-prefix "IPTables-Input: " --log-level 4
