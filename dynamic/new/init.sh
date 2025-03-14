@@ -21,11 +21,14 @@ xhost +SI:localuser:vscext
 echo "Succeed create user"
 echo "Start set privileges"
 echo "Privileges were changed"
-
+echo "\nStarting the installation"
 sudo mkdir -p /home/vscext/asd
 sudo cp /home/amir/Загрузки/code-stable-x64-1741787903.tar.gz /home/vscext/asd/
 sudo tar -xzvf /home/vscext/asd/code-stable-x64-1741787903.tar.gz -C /home/vscext/asd/
 # Run VSCode as the new user
+echo "Set iptables rule"
+sudo iptables -I OUTPUT -m owner --uid-owner `id -u vscext` -j LOG --log-prefix "VSCode : " --log-level 4
+
+
 sudo -u vscext /home/vscext/asd/VSCode-linux-x64/./code --extensions-dir /home/`whoami`/.vscode/extensions/
 
-sudo iptables -I OUTPUT -m owner --uid-owner `id -u vscext` -j LOG --log-prefix "IPTables-Input: " --log-level 4
