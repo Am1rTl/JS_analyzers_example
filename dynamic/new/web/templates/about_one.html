@@ -14,17 +14,17 @@
    <div class="bg-white rounded-lg shadow-lg p-6">
     <div class="flex items-center justify-between">
      <div class="flex items-center">
-      <img alt="Extension logo" class="w-12 h-12 rounded-full" src="https://placehold.co/50x50"/>
+      <img alt="Extension logo" class="w-12 h-12 rounded-full" style="width: 5rem; height: 5rem" src="{{ img }}"/>
       <div class="ml-4">
        <h1 class="text-2xl font-bold">
-        GPT Pilot (Beta)
+        {{ name }}
        </h1>
        <p class="text-gray-600">
-        PythagoraTechnologies
+        {{ author }}
        </p>
        <p class="text-gray-600 text-sm">
-        ID: PythagoraTechnologies.gpt-pilot-vs-code
-        <a class="text-blue-500" href="#">
+        ID: {{ id }}
+        <a class="text-blue-500" href="https://marketplace.visualstudio.com/items?itemName={{id}}">
          <i class="fas fa-external-link-alt">
          </i>
         </a>
@@ -213,6 +213,7 @@
      </div>
     </div>
    </div>
+   <a href="/" style="--tw-bg-opacity: 1; background-color: rgb(99 102 241/var(--tw-bg-opacity));" class="absolute top-4 left-4 text-white bg-blue-500 px-4 py-2 rounded">Назад</a>
   </div>
   <script>
    const ctx1 = document.getElementById('chart1').getContext('2d');
