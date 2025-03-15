@@ -291,8 +291,8 @@
      const suggestionItem = e.target.closest('.suggestion-item');
      if (suggestionItem) {
        const index = parseInt(suggestionItem.dataset.index);
-       searchInput.value = currentSuggestions[index];
-       suggestionsContainer.classList.add('hidden');
+       const extensionName = currentSuggestions[index];
+       window.location.href = `/about/${extensionName}`;
      }
    });
 
