@@ -1,0 +1,337 @@
+<html>
+ <head>
+  <title>ExtensionTotal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+   body {
+     font-family: 'Inter', sans-serif;
+   }
+   .suggestions-container {
+     opacity: 0;
+     transform: translateY(-10px);
+     transition: all 0.2s ease-in-out;
+   }
+   .suggestions-container.show {
+     opacity: 1;
+     transform: translateY(0);
+   }
+   .suggestion-item {
+     transition: background-color 0.2s ease;
+   }
+   .suggestion-item:hover {
+     background-color: rgba(147, 51, 234, 0.1);
+   }
+  </style>
+ </head>
+ <body class="bg-gradient-to-b from-purple-500 to-blue-500 text-white min-h-screen flex flex-col">
+  <header class="flex justify-between items-center p-4">
+   <div class="flex items-center space-x-2">
+   </div>
+   <div class="flex items-center space-x-2">
+    <a class="bg-white text-purple-500 py-2 px-4 rounded-full" href="#">
+     Как использовать?
+    </a>
+    <div class="bg-white p-2 rounded-full">
+     <i class="fas fa-user text-purple-500"></i>
+    </div>
+   </div>
+  </header>
+  <main class="flex flex-col items-center mt-16 flex-grow">
+   <h1 class="text-5xl font-bold">
+    Visual Studio Code Extension Analyzer
+   </h1>
+   <div class="mt-8 relative w-full max-w-3xl">
+    <div class="flex items-center space-x-2 bg-white p-4 rounded-full shadow-lg">
+      <input id="searchInput" class="bg-transparent outline-none text-black flex-grow" placeholder="Найти расширение на компьютере" type="text"/>
+      <button class="text-black">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+    <!-- Suggestions Container -->
+    <div id="suggestionsContainer" class="suggestions-container absolute w-full mt-2 bg-white rounded-2xl shadow-xl z-50 max-h-96 overflow-y-auto hidden">
+    </div>
+   </div>
+   <div class="mt-4 text-white text-lg font-bold">
+    OR
+   </div>
+   <div class="mt-4 flex space-x-2">
+    <div class="bg-white text-black p-2 rounded-full flex items-center space-x-2">
+     <i class="fas fa-circle text-gray-500"></i>
+     <span>Python</span>
+     <i class="fas fa-times text-gray-500"></i>
+    </div>
+    <div class="bg-white text-black p-2 rounded-full flex items-center space-x-2">
+     <i class="fab fa-github text-gray-500"></i>
+     <span>Github</span>
+     <i class="fas fa-times text-gray-500"></i>
+    </div>
+    <div class="bg-white text-black p-2 rounded-full flex items-center space-x-2">
+     <i class="fas fa-robot text-gray-500"></i>
+     <span>Chat GPT</span>
+     <i class="fas fa-times text-gray-500"></i>
+    </div>
+    <div class="bg-white text-black p-2 rounded-full flex items-center space-x-2">
+     <i class="fas fa-code text-gray-500"></i>
+     <span>Prettier</span>
+     <i class="fas fa-times text-gray-500"></i>
+    </div>
+   </div>
+  </main>
+  <footer class="bg-white text-black py-32 mt-16 w-full flex">
+   <div class="w-1/2 p-8 flex justify-center">
+    <div class="flex space-x-16 justify-center">
+     <div class="flex flex-col items-center">
+      <div class="text-center text-lg font-bold mb-2">
+       CPU
+      </div>
+      <div class="bg-gray-200 h-64 w-64 rounded-lg shadow-inner">
+       <canvas id="chart1"></canvas>
+      </div>
+     </div>
+     <div class="flex flex-col items-center">
+      <div class="text-center text-lg font-bold mb-2">
+       Memory
+      </div>
+      <div class="bg-gray-200 h-64 w-64 rounded-lg shadow-inner">
+       <canvas id="chart2"></canvas>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="w-1/2 p-8">
+    <div class="text-lg font-bold mb-4">
+     Недавние действия
+    </div>
+    <ul class="list-none">
+     <li class="mb-2">
+      <span class="bg-blue-200 text-blue-800 py-1 px-3 rounded-full inline-block">
+       Python
+      </span>
+      : Создание дочернего процесса
+     </li>
+     <li class="mb-2">
+      <span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full inline-block">
+       Github
+      </span>
+      : Редактирование файла
+     </li>
+     <li class="mb-2">
+      <span class="bg-green-200 text-green-800 py-1 px-3 rounded-full inline-block">
+       Chat GPT
+      </span>
+      : Запрос к сайту
+     </li>
+     <li>
+      <span class="bg-pink-200 text-pink-800 py-1 px-3 rounded-full inline-block">
+       Prettier
+      </span>
+      : Форматирование кода
+     </li>
+    </ul>
+   </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+   const ctx1 = document.getElementById('chart1').getContext('2d');
+   const chart1 = new Chart(ctx1, {
+       type: 'line',
+       data: {
+           labels: ['0', '1', '2', '3', '4', '5', '6'],
+           datasets: [{
+               label: 'CPU Usage',
+               data: [65, 59, 80, 81, 56, 55, 40],
+               borderColor: 'rgba(75, 192, 192, 1)',
+               borderWidth: 1,
+               fill: false
+           }]
+       },
+       options: {
+           responsive: true,
+           maintainAspectRatio: false,
+           scales: {
+               x: {
+                   display: true,
+                   title: {
+                       display: true,
+                       text: 'Minutes Ago'
+                   },
+                   reverse: true
+               },
+               y: {
+                   display: true,
+                   title: {
+                       display: true,
+                       text: 'Value (%)'
+                   }
+               }
+           }
+       }
+   });
+
+   const ctx2 = document.getElementById('chart2').getContext('2d');
+   const chart2 = new Chart(ctx2, {
+       type: 'line',
+       data: {
+           labels: ['0', '1', '2', '3', '4', '5', '6'],
+           datasets: [{
+               label: 'Memory Usage',
+               data: [28, 48, 40, 19, 86, 27, 90],
+               borderColor: 'rgba(153, 102, 255, 1)',
+               borderWidth: 1,
+               fill: false
+           }]
+       },
+       options: {
+           responsive: true,
+           maintainAspectRatio: false,
+           scales: {
+               x: {
+                   display: true,
+                   title: {
+                       display: true,
+                       text: 'Minutes Ago'
+                   },
+                   reverse: true
+               },
+               y: {
+                   display: true,
+                   title: {
+                       display: true,
+                       text: 'Value (%)'
+                   }
+               }
+           }
+       }
+   });
+
+   // Search Functionality
+   const searchInput = document.getElementById('searchInput');
+   const suggestionsContainer = document.getElementById('suggestionsContainer');
+   let currentSuggestions = [];
+   let selectedIndex = -1;
+
+   // Debounce function
+   function debounce(func, wait) {
+     let timeout;
+     return function executedFunction(...args) {
+       const later = () => {
+         clearTimeout(timeout);
+         func(...args);
+       };
+       clearTimeout(timeout);
+       timeout = setTimeout(later, wait);
+     };
+   }
+
+   // Fetch suggestions from the server
+   async function fetchSuggestions(query) {
+     try {
+       const response = await fetch('/get_ext_list');
+       if (!response.ok) throw new Error('Network response was not ok');
+       const extensions = await response.json();
+       return extensions.filter(ext => 
+         ext.toLowerCase().includes(query.toLowerCase())
+       ).slice(0, 8); // Limit to 8 suggestions
+     } catch (error) {
+       console.error('Error fetching suggestions:', error);
+       return [];
+     }
+   }
+
+   // Highlight matching text
+   function highlightMatch(text, query) {
+     if (!query) return text;
+     const regex = new RegExp(`(${query})`, 'gi');
+     return text.replace(regex, '<strong class="text-purple-600">$1</strong>');
+   }
+
+   // Render suggestions
+   function renderSuggestions(suggestions, query) {
+     if (!suggestions.length) {
+       suggestionsContainer.classList.add('hidden');
+       return;
+     }
+
+     suggestionsContainer.innerHTML = suggestions
+       .map((suggestion, index) => `
+         <div class="suggestion-item p-3 cursor-pointer text-gray-700 ${
+           index === selectedIndex ? 'bg-purple-50' : ''
+         }" data-index="${index}">
+           <div class="flex items-center">
+             <i class="fas fa-search text-gray-400 mr-3"></i>
+             <div>${highlightMatch(suggestion, query)}</div>
+           </div>
+         </div>
+       `)
+       .join('');
+
+     suggestionsContainer.classList.remove('hidden');
+     suggestionsContainer.classList.add('show');
+   }
+
+   // Handle input changes
+   const handleInput = debounce(async (e) => {
+     const query = e.target.value.trim();
+     if (!query) {
+       suggestionsContainer.classList.add('hidden');
+       return;
+     }
+
+     currentSuggestions = await fetchSuggestions(query);
+     renderSuggestions(currentSuggestions, query);
+   }, 300);
+
+   // Event Listeners
+   searchInput.addEventListener('input', handleInput);
+
+   // Click handler for suggestions
+   suggestionsContainer.addEventListener('click', (e) => {
+     const suggestionItem = e.target.closest('.suggestion-item');
+     if (suggestionItem) {
+       const index = parseInt(suggestionItem.dataset.index);
+       searchInput.value = currentSuggestions[index];
+       suggestionsContainer.classList.add('hidden');
+     }
+   });
+
+   // Keyboard navigation
+   searchInput.addEventListener('keydown', (e) => {
+     if (!currentSuggestions.length) return;
+
+     switch(e.key) {
+       case 'ArrowDown':
+         e.preventDefault();
+         selectedIndex = Math.min(selectedIndex + 1, currentSuggestions.length - 1);
+         renderSuggestions(currentSuggestions, searchInput.value);
+         break;
+       case 'ArrowUp':
+         e.preventDefault();
+         selectedIndex = Math.max(selectedIndex - 1, -1);
+         renderSuggestions(currentSuggestions, searchInput.value);
+         break;
+       case 'Enter':
+         if (selectedIndex >= 0) {
+           searchInput.value = currentSuggestions[selectedIndex];
+           suggestionsContainer.classList.add('hidden');
+           selectedIndex = -1;
+         }
+         break;
+       case 'Escape':
+         suggestionsContainer.classList.add('hidden');
+         selectedIndex = -1;
+         break;
+     }
+   });
+
+   // Close suggestions when clicking outside
+   document.addEventListener('click', (e) => {
+     if (!e.target.closest('#searchInput') && !e.target.closest('#suggestionsContainer')) {
+       suggestionsContainer.classList.add('hidden');
+       selectedIndex = -1;
+     }
+   });
+  </script>
+ </body>
+</html>

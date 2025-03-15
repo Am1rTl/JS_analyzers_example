@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Data Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <style>
+        .checked-row {
+            background-color: #D8B4FE; /* Tailwind's purple-200 */
+            border-radius: 0.375rem; /* Tailwind's rounded-md */
+        }
+    </style>
+    <script>
+        function toggleRowHighlight(checkbox) {
+            const row = checkbox.closest('li');
+            if (checkbox.checked) {
+                row.classList.add('checked-row');
+            } else {
+                row.classList.remove('checked-row');
+            }
+        }
+
+        function addItem(inputId, listId) {
+            const input = document.getElementById(inputId);
+            const list = document.getElementById(listId);
+            const value = input.value.trim();
+
+            if (value) {
+                const li = document.createElement('li');
+                li.className = 'flex items-center mb-2 px-4'; /* Added padding-left and padding-right */
+                li.innerHTML = `
+                    <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                    <span class="flex-grow">${value}</span>
+                    <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                `;
+                list.appendChild(li);
+                input.value = '';
+            }
+        }
+
+        function removeItem(icon) {
+            const row = icon.closest('li');
+            row.remove();
+        }
+
+        function handleKeyPress(event, inputId, listId) {
+            if (event.key === 'Enter') {
+                addItem(inputId, listId);
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold mb-6">Правила безопасности</h1>
+
+        <!-- Process Control Block -->
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+            <h2 class="text-xl font-semibold mb-4">Управление процессами</h2>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Заблокированные исполняемые файлы</h3>
+                <ul id="blocked-executables-list">
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">cmd.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">powershell.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">bash.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">python.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4 checked-row">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)" checked>
+                        <span class="flex-grow">node.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">npm.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">wscript.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">cscript.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">reg.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">regedit.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">sc.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">mshta.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                </ul>
+                <div class="flex mt-4">
+                    <input type="text" id="blocked-executables-input" class="border p-2 flex-grow mr-2 rounded" placeholder="Добавить новый исполняемый файл" onkeypress="handleKeyPress(event, 'blocked-executables-input', 'blocked-executables-list')">
+                    <button class="bg-purple-500 text-white p-2 rounded" onclick="addItem('blocked-executables-input', 'blocked-executables-list')">Add</button>
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Разрешенные исполняемые файлы</h3>
+                <ul id="allowed-executables-list">
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">code.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">code-insiders.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                </ul>
+                <div class="flex mt-4">
+                    <input type="text" id="allowed-executables-input" class="border p-2 flex-grow mr-2 rounded" placeholder="Добавить новый исполняемый файл" onkeypress="handleKeyPress(event, 'allowed-executables-input', 'allowed-executables-list')">
+                    <button class="bg-purple-500 text-white p-2 rounded" onclick="addItem('allowed-executables-input', 'allowed-executables-list')">Add</button>
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Максимальное количество дочерних процессов</h3>
+                <div class="flex items-center px-4">
+                    <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                    <input type="number" class="border p-2 flex-grow rounded" value="5">
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Тайм-аут процесса (секунды)</h3>
+                <div class="flex items-center px-4">
+                    <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                    <input type="number" class="border p-2 flex-grow rounded" value="30">
+                </div>
+            </div>
+        </div>
+
+        <!-- Resource Limits Block -->
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+            <h2 class="text-xl font-semibold mb-4">Ограничения ресурсов</h2>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Максимальное использование памяти (МБ)</h3>
+                <div class="flex items-center px-4">
+                    <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                    <input type="number" class="border p-2 flex-grow rounded" value="500">
+                    <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Максимальный процент использования ЦП</h3>
+                <div class="flex items-center px-4">
+                    <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                    <input type="number" class="border p-2 flex-grow rounded" value="50">
+                    <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Network Security Block -->
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+            <h2 class="text-xl font-semibold mb-4">Сетевая безопасность</h2>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Заблокированные сетевые порты</h3>
+                <ul id="blocked-ports-list">
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">20</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">21</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">22</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">23</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">25</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">53</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">80</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">443</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">3306</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">5432</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">8080</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                </ul>
+                <div class="flex mt-4">
+                    <input type="text" id="blocked-ports-input" class="border p-2 flex-grow mr-2 rounded" placeholder="Добавить новый порт" onkeypress="handleKeyPress(event, 'blocked-ports-input', 'blocked-ports-list')">
+                    <button class="bg-purple-500 text-white p-2 rounded" onclick="addItem('blocked-ports-input', 'blocked-ports-list')">Add</button>
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Заблокированные сетевые домены</h3>
+                <ul id="blocked-hosts-list">
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">raw.githubusercontent.com</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">pastebin.com</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">ngrok.io</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">gist.github.com</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">paste.ee</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">hastebin.com</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">www.useblackbox.io</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                </ul>
+                <div class="flex mt-4">
+                    <input type="text" id="blocked-hosts-input" class="border p-2 flex-grow mr-2 rounded" placeholder="Добавить новый домен" onkeypress="handleKeyPress(event, 'blocked-hosts-input', 'blocked-hosts-list')">
+                    <button class="bg-purple-500 text-white p-2 rounded" onclick="addItem('blocked-hosts-input', 'blocked-hosts-list')">Add</button>
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Разрешенные домены</h3>
+                <ul id="allowed-domains-list">
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">marketplace.visualstudio.com</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">vscode.dev</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">github.com</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                </ul>
+                <div class="flex mt-4">
+                    <input type="text" id="allowed-domains-input" class="border p-2 flex-grow mr-2 rounded" placeholder="Добавить новый домен" onkeypress="handleKeyPress(event, 'allowed-domains-input', 'allowed-domains-list')">
+                    <button class="bg-purple-500 text-white p-2 rounded" onclick="addItem('allowed-domains-input', 'allowed-domains-list')">Add</button>
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Максимальный объем исходящих данных (МБ)</h3>
+                <div class="flex items-center px-4">
+                    <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                    <input type="number" class="border p-2 flex-grow rounded" value="50">
+                    <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Использование SSL шифрования</h3>
+                <div class="flex items-center px-4">
+                    <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                    <span>Использование SSL шифрования</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filesystem Protection Block -->
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+            <h2 class="text-xl font-semibold mb-4">Защита файловой системы</h2>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Заблокированные пути</h3>
+                <ul id="blocked-paths-list">
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">C:\Windows\System32</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">C:\Windows\SysWOW64</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">/etc/</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">/usr/bin</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">/usr/local/bin</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">%APPDATA%\Microsoft</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">%USERPROFILE%\.ssh</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                </ul>
+                <div class="flex mt-4">
+                    <input type="text" id="blocked-paths-input" class="border p-2 flex-grow mr-2 rounded" placeholder="Добавить новый путь" onkeypress="handleKeyPress(event, 'blocked-paths-input', 'blocked-paths-list')">
+                    <button class="bg-purple-500 text-white p-2 rounded" onclick="addItem('blocked-paths-input', 'blocked-paths-list')">Add</button>
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Разрешенные пути</h3>
+                <ul id="allowed-paths-list">
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">%APPDATA%\Code\User\extensions</span>
+                        <i class="fas fa-trash-alt text-red-500 ml -4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">%USERPROFILE%\.vscode\extensions</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                </ul>
+                <div class="flex mt-4">
+                    <input type="text" id="allowed-paths-input" class="border p-2 flex-grow mr-2 rounded" placeholder="Добавить новый путь" onkeypress="handleKeyPress(event, 'allowed-paths-input', 'allowed-paths-list')">
+                    <button class="bg-purple-500 text-white p-2 rounded" onclick="addItem('allowed-paths-input', 'allowed-paths-list')">Add</button>
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Заблокированные расширения файлов</h3>
+                <ul id="blocked-extensions-list">
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">.exe</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">.dll</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">.sys</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">.bat</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">.cmd</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">.ps1</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">.msi</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                    <li class="flex items-center mb-2 px-4">
+                        <input type="checkbox" class="mr-4" onclick="toggleRowHighlight(this)">
+                        <span class="flex-grow">.sh</span>
+                        <i class="fas fa-trash-alt text-red-500 ml-4 cursor-pointer" onclick="removeItem(this)"></i>
+                    </li>
+                </ul>
+                <div class="flex mt-4">
+                    <input type="text" id="blocked-extensions-input" class="border p-2 flex-grow mr-2 rounded" placeholder="Добавить новое заблокированное расширение" onkeypress="handleKeyPress(event, 'blocked-extensions-input', 'blocked-extensions-list')">
+                    <button class="bg-purple-500 text-white p-2 rounded" onclick="addItem('blocked-extensions-input', 'blocked-extensions-list')">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
