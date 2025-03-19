@@ -79,7 +79,6 @@ def rules():
 @app.route('/logs')
 def logs():
     log_data = '\n'.join(get_logs())
-    print(log_data.encode())
     return render_template('logs.html', log_data=log_data)
 
 if __name__ == '__main__':
