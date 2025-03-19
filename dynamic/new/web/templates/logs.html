@@ -153,19 +153,16 @@
         fetch('/get_chart_data')
             .then(response => response.json())
             .then(data => {
-                const truncatedCpuData = data.cpu.slice(-newRange.value);
-                const truncatedMemoryData = data.memory.slice(-newRange.value);
+                const truncatedData = chartId === 'chart1' ? data.cpu : data.memory;
+                const truncatedDataSlice = truncatedData.slice(-newRange.value);
 
-                const aggregatedCpuData = aggregateData(truncatedCpuData, interval);
-                const aggregatedMemoryData = aggregateData(truncatedMemoryData, interval);
+                const aggregatedData = aggregateData(truncatedDataSlice, interval);
 
-                chart1.data.datasets[0].data = aggregatedCpuData;
-                chart1.options.scales.y.max = Math.max(...aggregatedCpuData) + 10;
-                chart1.update();
-                chart2.data.datasets[0].data = aggregatedMemoryData;
-                chart2.options.scales.y.max = Math.max(...aggregatedMemoryData) + 10;
-                chart2.update();
+                chart.data.datasets[0].data = aggregatedData;
+                chart.options.scales.y.max = Math.max(...aggregatedData) + 10;
+                chart.update();
             });
+            fetchAndUpdateCharts();
     }
 
     function scrollToBottom() {
