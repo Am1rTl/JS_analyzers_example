@@ -17,7 +17,8 @@ setfacl -m u:vscext:rwx /home/amir
 
 # Allow the new user to access the display
 xhost +SI:localuser:vscext
-
+touch /tmp/asd
+chmod 666 /tmp/asd
 echo "Succeed create user"
 echo "Start set privileges"
 echo "Privileges were changed"

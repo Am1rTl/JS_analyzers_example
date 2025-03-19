@@ -1,12 +1,9 @@
-import os
-import time
+import subprocess
 
-# Open /dev/kmsg in binary mode
-with open("/dev/kmsg", 'rb') as f:
-    while True:
-        # Read a specific number of bytes (e.g., 1024)
-        data = os.read(f.fileno(), 1024)
-        if data:
-            print(data.decode('utf-8', errors='ignore'))
-        else:
-            time.sleep(0.1)  # Sleep briefly to avoid busy waiting
+# Пример команды с аргументами
+command = "sudo cat /dev/kmsg > /tmp/asd"
+
+# Запуск команды в фоновом режиме
+process = subprocess.Popen(command, shell=True)
+
+print("Команда запущена в фоновом режиме.")
