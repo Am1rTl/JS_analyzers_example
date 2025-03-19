@@ -2,6 +2,7 @@ from functools import lru_cache
 import subprocess
 import requests as r
 from flask import Flask, render_template, jsonify, request
+from format_logs import get_logs
 
 app = Flask(__name__)
 
@@ -60,7 +61,6 @@ def home():
 def search_extension():
     data = request.get_json()
     extension_name = data.get('extensionName')
-    # Here you can implement the logic to handle the extension name
     return jsonify({'message': f'Search for {extension_name} received.'})
 
 @app.route('/about')
@@ -78,7 +78,9 @@ def rules():
 
 @app.route('/logs')
 def logs():
-    return render_template('logs.html')
+    log_data = '\n'.join(get_logs())
+    print(log_data.encode())
+    return render_template('logs.html', log_data=log_data)
 
 if __name__ == '__main__':
     app.run(debug=True)

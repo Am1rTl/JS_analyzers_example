@@ -50,33 +50,8 @@
         <p class="font-bold">
          Обращение к сетевым ресурсам
         </p>
-        <div class="grid grid-cols-2 gap-4 bg-gray-100 p-2 rounded">
-         <div>
-          <p class="text-gray-600">
-           Пн	12	Янв	12:00:30	- 192.168.1.1
-           <br/>
-           Вт	13	Янв	12:05:45	- 192.168.1.2
-           <br/>
-           Ср	14	Янв	12:10:15	- 192.168.1.3
-           <br/>
-           Чт	15	Янв	12:15:50	- 192.168.1.4
-           <br/>
-           Пт	16	Янв	12:20:05	- 192.168.1.5
-          </p>
-         </div>
-         <div>
-          <p class="text-gray-600">
-           Accepted
-           <br/>
-           Blocked
-           <br/>
-           Accepted
-           <br/>
-           Blocked
-           <br/>
-           Accepted
-          </p>
-         </div>
+        <div class="grid grid-cols-2 gap-4 bg-gray-100 p-2 rounded" style="max-height: 400px; overflow-y: auto;">
+            <pre class="bg-gray-100 p-2 rounded">{{ log_data }}</pre>
         </div>
        </div>
        <span class="bg-red-100 text-red-500 px-3 py-1 rounded-full">
@@ -196,7 +171,12 @@
    <a href="/" style="--tw-bg-opacity: 1; background-color: rgb(99 102 241/var(--tw-bg-opacity));" class="absolute top-4 left-4 text-white bg-blue-500 px-4 py-2 rounded">Назад</a>
   </div>
   <script>
-   const ctx1 = document.getElementById('chart1').getContext('2d');
+        const ctx1 = document.getElementById('chart1').getContext('2d');
+        window.onload = function() {
+            const logContainer = document.querySelector('.grid.grid-cols-2.gap-4.bg-gray-100.p-2.rounded');
+            logContainer.scrollTop = logContainer.scrollHeight; // Scroll to the bottom
+        };
+
         const chart1 = new Chart(ctx1, {
             type: 'line',
             data: {
