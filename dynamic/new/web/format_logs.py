@@ -18,5 +18,5 @@ def get_logs():
             
             new.append(f"{time:5}, [DEST]={dst:15} [PORT]={dst_port:5} [Pack len]={lenght:5}")
         except:
-            print(log)
+            continue
     return new

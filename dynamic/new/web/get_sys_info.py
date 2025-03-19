@@ -3,7 +3,7 @@ import time
 import subprocess
 
 def get_pid():
-    command = "ps aux | grep code | sort -h | head -n 1"
+    command = "ps aux | grep code | grep -v grep | sort -h | head -n 1"
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     output_lines = result.stdout.strip().split('\n')[0]
     output_lines = output_lines.strip().split(' ')
@@ -55,7 +55,7 @@ def monitor_process(pid):
 if __name__ == "__main__":
     try:
         pid = get_pid()
-        print("PID получен, начинаю логирование")
+        print(f"PID получен, начинаю логирование процесса {pid}")
         monitor_process(pid)
     except ValueError:
         print("Пожалуйста, введите корректный числовой PID.")
