@@ -3,6 +3,7 @@ import subprocess
 import pwd
 import shutil
 import json
+import psutil
 
 def load_config(config_path="config.json"):
     """Загружает конфигурацию из JSON-файла."""
@@ -39,14 +40,59 @@ def apply_cgroup_restrictions(username, max_processes):
     """Настраивает cgroup для ограничения количества процессов."""
     print(f"[INFO] Ограничиваю число процессов до {max_processes}...")
     cgroup_path = f"/sys/fs/cgroup/pids/{username}"
+
+    # Создаем cgroup, если он еще не существует
     subprocess.run(["sudo", "mkdir", "-p", cgroup_path], check=True)
-    subprocess.run(["sudo", "bash", "-c", f"echo {max_processes} > {cgroup_path}/pids.max"], check=True)
-    subprocess.run(["sudo", "bash", "-c", f"echo $(id -u {username}) > {cgroup_path}/cgroup.procs"], check=True)
+    
+    # Применяем ограничения на количество процессов
+    try:
+        subprocess.run(["sudo", "bash", "-c", f"echo {max_processes} > {cgroup_path}/pids.max"], check=True)
+        subprocess.run(["sudo", "bash", "-c", f"echo $(id -u {username}) > {cgroup_path}/cgroup.procs"], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"[ERROR] Ошибка при настройке cgroup: {e}")
+        # Выводим сообщение об ошибке и продолжаем выполнение
+
+
+def is_extension_process(proc):
+    """Проверяет, является ли процесс расширением VSCode."""
+    try:
+        # Проверяем, запущен ли процесс с использованием имени или других признаков VSCode
+        if 'code' in proc.name():
+            # Мы можем попробовать извлечь дополнительные признаки расширения по аргументам или файлам
+            # Например, можно проверить команду, с которой был запущен процесс
+            if "--extensionHost" in proc.cmdline():
+                return True
+    except psutil.NoSuchProcess:
+        return False
+    return False
+
+def isolate_extension_processes(vscode_pid, username):
+    """Изолирует только процессы, связанные с расширениями."""
+    print("[INFO] Изолирую процессы, связанные с расширениями...")
+    
+    # Получаем все дочерние процессы VSCode
+    for proc in psutil.Process(vscode_pid).children(recursive=True):
+        if is_extension_process(proc):
+            print(f"[INFO] Изолирую процесс расширения: {proc.pid}")
+            subprocess.run(["sudo", "cgexec", "-g", "pids:{}/extension_group".format(username), "kill", "-STOP", str(proc.pid)])
+            
+            # Применяем ограничения на ресурсы
+            apply_network_restrictions(username, False)
+            apply_file_restrictions(username, False)
+            apply_cgroup_restrictions(username, config.get("max_processes", 10))
+            subprocess.run(["sudo", "cgexec", "-g", "pids:{}/extension_group".format(username), "kill", "-CONT", str(proc.pid)])
 
 def launch_vscode(username):
     """Запускает VSCode под новым пользователем."""
     print("[INFO] Запускаю VSCode...")
-    subprocess.run(["sudo", "-u", username, "code"], check=True)
+    process = subprocess.Popen(["sudo", "-u", username, "code"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    
+    # Ожидаем, пока запустится основной процесс VSCode
+    vscode_pid = process.pid
+    print(f"[INFO] PID VSCode: {vscode_pid}")
+    
+    # Изолируем дочерние процессы (расширения)
+    isolate_extension_processes(vscode_pid, username)
 
 if __name__ == "__main__":
     SANDBOX_USER = "vscode_sandbox"

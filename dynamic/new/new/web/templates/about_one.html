@@ -1,0 +1,294 @@
+<html>
+ <head>
+  <title>
+   Extension Risk Report
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js">
+  </script>
+ </head>
+ <body class="bg-gray-100 font-sans">
+  <div class="max-w-6xl mx-auto p-4">
+   <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="flex items-center justify-between">
+     <div class="flex items-center">
+      <img alt="Extension logo" class="w-12 h-12 rounded-full" style="width: 5rem; height: 5rem" src="{{ img }}"/>
+      <div class="ml-4">
+       <h1 class="text-2xl font-bold">
+        {{ name }}
+       </h1>
+       <p class="text-gray-600">
+        {{ author }}
+       </p>
+       <p class="text-gray-600 text-sm">
+        ID: {{ id }}
+        <a class="text-blue-500" href="https://marketplace.visualstudio.com/items?itemName={{id}}">
+         <i class="fas fa-external-link-alt">
+         </i>
+        </a>
+       </p>
+      </div>
+     </div>
+     <button class="text-white px-4 py-2 rounded-full" style="--tw-bg-opacity: 1; background-color: rgb(99 102 241/var(--tw-bg-opacity));">
+      Настроить правила безопасности
+     </button>
+    </div>
+   </div>
+   <div class="mt-6 flex flex-col lg:flex-row">
+    <div class="w-full lg:w-1/4 bg-white rounded-lg shadow-lg p-6 mb-6 lg:mb-0">
+     <div class="flex flex-col items-center mb-6">
+      <div class="text-center text-lg font-bold mb-2">
+       CPU
+      </div>
+      <div class="bg-gray-200 h-64 w-full rounded-lg shadow-inner">
+       <canvas height="256" id="chart1" style="display: block; box-sizing: border-box; height: 256px; width: 232px;" width="232">
+       </canvas>
+      </div>
+     </div>
+     <div class="flex flex-col items-center">
+      <div class="text-center text-lg font-bold mb-2">
+       Memory
+      </div>
+      <div class="bg-gray-200 h-64 w-full rounded-lg shadow-inner">
+       <canvas height="256" id="chart2" style="display: block; box-sizing: border-box; height: 256px; width: 232px;" width="232">
+       </canvas>
+      </div>
+     </div>
+    </div>
+    <div class="w-full lg:w-3/4 lg:ml-6 bg-white rounded-lg shadow-lg p-6">
+     <h2 class="text-xl font-bold">
+      Отчёт
+     </h2>
+     <p class="text-gray-600">
+      Оцените риск использования расширения, используя предоставленную информацию
+     </p>
+     <div class="mt-4">
+      <div class="flex justify-between items-center border-b py-4">
+       <div>
+        <p class="font-bold">
+         Обращение к сетевым ресурсам
+        </p>
+        <div class="grid grid-cols-2 gap-4 bg-gray-100 p-2 rounded">
+         <div>
+          <p class="text-gray-600">
+           Пн	12	Янв	12:00:30	- 192.168.1.1
+           <br/>
+           Вт	13	Янв	12:05:45	- 192.168.1.2
+           <br/>
+           Ср	14	Янв	12:10:15	- 192.168.1.3
+           <br/>
+           Чт	15	Янв	12:15:50	- 192.168.1.4
+           <br/>
+           Пт	16	Янв	12:20:05	- 192.168.1.5
+          </p>
+         </div>
+         <div>
+          <p class="text-gray-600">
+           Accepted
+           <br/>
+           Blocked
+           <br/>
+           Accepted
+           <br/>
+           Blocked
+           <br/>
+           Accepted
+          </p>
+         </div>
+        </div>
+       </div>
+       <span class="bg-red-100 text-red-500 px-3 py-1 rounded-full">
+        HIGH
+       </span>
+      </div>
+      <div class="flex justify-between items-center border-b py-4">
+       <div>
+        <p class="font-bold">
+         Чтение файлов
+        </p>
+        <div class="grid grid-cols-2 gap-4 bg-gray-100 p-2 rounded">
+         <div>
+          <p class="text-gray-600">
+           Пн	12	Янв	12:00:30	- Read - /path/to/file1.txt
+           <br/>
+           Вт	13	Янв	12:05:45	- Read - /path/to/file2.txt
+           <br/>
+           Ср	14	Янв	12:10:15	- Read - /path/to/file3.txt
+           <br/>
+           Чт	15	Янв	12:15:50	- Read - /path/to/file4.txt
+           <br/>
+           Пт	16	Янв	12:20:05	- Read - /path/to/file5.txt
+          </p>
+         </div>
+         <div>
+          <p class="text-gray-600">
+           Accepted
+           <br/>
+           Blocked
+           <br/>
+           Accepted
+           <br/>
+           Blocked
+           <br/>
+           Accepted
+          </p>
+         </div>
+        </div>
+       </div>
+       <span class="bg-yellow-100 text-yellow-500 px-3 py-1 rounded-full">
+        MED
+       </span>
+      </div>
+      <div class="flex justify-between items-center border-b py-4">
+       <div>
+        <p class="font-bold">
+         Запись файлов
+        </p>
+        <div class="grid grid-cols-2 gap-4 bg-gray-100 p-2 rounded">
+         <div>
+          <p class="text-gray-600">
+           Пн	12	Янв	12:00:30	- Write - /path/to/file1.txt
+           <br/>
+           Вт	13	Янв	12:05:45	- Write - /path/to/file2.txt
+           <br/>
+           Ср	14	Янв	12:10:15	- Write - /path/to/file3.txt
+           <br/>
+           Чт	15	Янв	12:15:50	- Write - /path/to/file4.txt
+           <br/>
+           Пт	16	Янв	12:20:05	- Write - /path/to/file5.txt
+          </p>
+         </div>
+         <div>
+          <p class="text-gray-600">
+           Accepted
+           <br/>
+           Blocked
+           <br/>
+           Accepted
+           <br/>
+           Blocked
+           <br/>
+           Accepted
+          </p>
+         </div>
+        </div>
+       </div>
+       <span class="bg-yellow-100 text-yellow-500 px-3 py-1 rounded-full">
+        MED
+       </span>
+      </div>
+      <div class="flex justify-between items-center border-b py-4">
+       <div>
+        <p class="font-bold">
+         Создание дочерних процессов
+        </p>
+        <p class="text-gray-600">
+         Расширение не создавало дочерние процессы.
+        </p>
+       </div>
+       <span class="bg-green-100 text-green-500 px-3 py-1 rounded-full">
+        LOW
+       </span>
+      </div>
+      <div class="flex justify-between items-center border-b py-4">
+       <div>
+        <p class="font-bold">
+         Выполнение команд
+        </p>
+        <p class="text-gray-600">
+         Никакие команды не выполнились.
+        </p>
+       </div>
+       <span class="bg-green-100 text-green-500 px-3 py-1 rounded-full">
+        LOW
+       </span>
+      </div>
+     </div>
+     <div class="mt-6 text-center">
+      <button class="text-white px-4 py-2 rounded-full" style="--tw-bg-opacity: 1; background-color: rgb(99 102 241/var(--tw-bg-opacity));">
+       Посмотреть подробные логи
+      </button>
+     </div>
+    </div>
+   </div>
+   <a href="/" style="--tw-bg-opacity: 1; background-color: rgb(99 102 241/var(--tw-bg-opacity));" class="absolute top-4 left-4 text-white bg-blue-500 px-4 py-2 rounded">Назад</a>
+  </div>
+  <script>
+   const ctx1 = document.getElementById('chart1').getContext('2d');
+        const chart1 = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: Array.from({ length: 9 }, (_, i) => 8 - i),
+                datasets: [{
+                    label: 'CPU Usage',
+                    data: Array.from({ length: 9 }, () => Math.random() * 15),
+                    borderColor: '#4CAF50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                    borderWidth: 1,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Minutes ago'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Value (%)'
+                        },
+                        beginAtZero: true,
+                        max: 15
+                    }
+                }
+            }
+        });
+
+        const ctx2 = document.getElementById('chart2').getContext('2d');
+        const chart2 = new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: Array.from({ length: 9 }, (_, i) => 8 - i),
+                datasets: [{
+                    label: 'Memory Usage',
+                    data: Array.from({ length: 9 }, () => Math.random() * 15),
+                    borderColor: '#FF9800',
+                    backgroundColor: 'rgba(255, 152, 0, 0.2)',
+                    borderWidth: 1,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Minutes ago'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Value (%)'
+                        },
+                        beginAtZero: true,
+                        max: 15
+                    }
+                }
+            }
+        });
+  </script>
+ </body>
+</html>
