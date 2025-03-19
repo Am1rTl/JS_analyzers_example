@@ -16,7 +16,7 @@ def get_logs():
             dst = log.split("DST=")[1].split(' ')[0]
             lenght = log.split("LEN=")[1].split(' ')[0]
             
-            new.append(f"{time}, [DEST]={dst}, [PORT]={dst_port}, [Pack len]={lenght}")
+            new.append(f"{time:5}, [DEST]={dst:15} [PORT]={dst_port:5} [Pack len]={lenght:5}")
         except:
             print(log)
     return new
