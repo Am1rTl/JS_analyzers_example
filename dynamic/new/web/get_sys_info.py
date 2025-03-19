@@ -1,5 +1,13 @@
 import psutil
 import time
+import subprocess
+
+def get_pid():
+	command = "ps aux | grep code | sort -h | cut -d ' ' -f 7"
+	result = subprocess.run(command, shell=True, capture_output=True, text=True)
+	output_lines = result.stdout.strip().split('\n')
+	pid = int(output_lines[0])
+	return pid
 
 def monitor_process(pid):
     while True:
@@ -34,7 +42,7 @@ def monitor_process(pid):
 
 if __name__ == "__main__":
     try:
-        pid = int(input("Введите PID процесса для мониторинга: "))
+        pid = get_pid()
         monitor_process(pid)
     except ValueError:
         print("Пожалуйста, введите корректный числовой PID.")
