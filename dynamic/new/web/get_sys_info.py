@@ -17,7 +17,7 @@ def monitor_process(pid):
                 proc = psutil.Process(pid)
                 # Получаем данные о CPU и RAM для основного процесса
                 cpu_usage = proc.cpu_percent(interval=1)  # Получаем процент использования CPU
-                memory_usage = proc.memory_info().rss / (1024 * 1024)  # Использование RAM в МБ
+                memory_usage = proc.memory_info().rss  # Использование RAM в МБ
                 
                 # Получаем дочерние процессы
                 child_procs = proc.children(recursive=True)
@@ -27,11 +27,12 @@ def monitor_process(pid):
                 # Суммируем показатели дочерних процессов
                 for child in child_procs:
                     total_cpu_usage += child.cpu_percent(interval=0)  # Получаем CPU дочернего процесса
-                    total_memory_usage += child.memory_info().rss / (1024 * 1024)  # Использование RAM в МБ
+                    total_memory_usage += child.memory_info().rss  # Использование RAM в МБ
                 
                 # CPU RAM
-
-                log_file.write(str(total_cpu_usage) + ' ' + str(int(total_memory_usage)))
+    
+                total_memory_usage_percentage = (total_memory_usage / psutil.virtual_memory().total) * 100  # Convert to percentage
+                log_file.write(str(total_cpu_usage) + ' ' + str(int(total_memory_usage_percentage)) + '\n')
                 log_file.write("\n")
                 log_file.flush()
             

@@ -171,11 +171,52 @@
    <a href="/" style="--tw-bg-opacity: 1; background-color: rgb(99 102 241/var(--tw-bg-opacity));" class="absolute top-4 left-4 text-white bg-blue-500 px-4 py-2 rounded">Назад</a>
   </div>
   <script>
+        setInterval(() => {
+            fetch('/get_chart_data')
+                .then(response => response.json())
+                .then(data => {
+                    const truncatedCpuData = data.cpu.slice(-10); // Get the last 10 data points
+                    const truncatedMemoryData = data.memory.slice(-10); // Get the last 10 data points
+                    chart1.data.datasets[0].data = truncatedCpuData;
+                    chart1.options.scales.y.max = Math.max(...truncatedCpuData) + 10; // Set y-axis max for CPU
+                    chart1.update();
+                    chart2.data.datasets[0].data = truncatedMemoryData;
+                    chart2.options.scales.y.max = Math.max(...truncatedMemoryData) + 10; // Set y-axis max for Memory
+                    chart2.update();
+                });
+        }, 10000); // Update every 10 seconds
         const ctx1 = document.getElementById('chart1').getContext('2d');
         window.onload = function() {
             const logContainer = document.querySelector('.grid.grid-cols-2.gap-4.bg-gray-100.p-2.rounded');
             logContainer.scrollTop = logContainer.scrollHeight; // Scroll to the bottom
+            
+            let zoomLevel = 1; // Initialize zoom level
+            const zoomInButton = document.createElement('button');
+            zoomInButton.innerText = '+';
+            zoomInButton.onclick = () => {
+                zoomLevel += 0.1; // Increase zoom level
+                updateChart();
+            };
+            const zoomOutButton = document.createElement('button');
+            zoomOutButton.innerText = '-';
+            zoomOutButton.onclick = () => {
+                zoomLevel = Math.max(1, zoomLevel - 0.1); // Decrease zoom level, minimum 1
+                updateChart();
+            };
+            document.body.appendChild(zoomInButton);
+            document.body.appendChild(zoomOutButton);
         };
+
+        function updateChart() {
+            const truncatedCpuData = data.cpu.slice(-10); // Get the last 10 data points
+            const truncatedMemoryData = data.memory.slice(-10); // Get the last 10 data points
+            chart1.data.datasets[0].data = truncatedCpuData;
+            chart1.options.scales.y.max = Math.max(...truncatedCpuData) * zoomLevel + 10; // Adjust y-axis max for CPU
+            chart1.update();
+            chart2.data.datasets[0].data = truncatedMemoryData;
+            chart2.options.scales.y.max = Math.max(...truncatedMemoryData) * zoomLevel + 10; // Adjust y-axis max for Memory
+            chart2.update();
+        }
 
         const chart1 = new Chart(ctx1, {
             type: 'line',
@@ -183,7 +224,7 @@
                 labels: Array.from({ length: 9 }, (_, i) => 8 - i),
                 datasets: [{
                     label: 'CPU Usage',
-                    data: Array.from({ length: 9 }, () => Math.random() * 15),
+                    data: [], // Start with empty data
                     borderColor: '#4CAF50',
                     backgroundColor: 'rgba(76, 175, 80, 0.2)',
                     borderWidth: 1,
@@ -220,7 +261,7 @@
                 labels: Array.from({ length: 9 }, (_, i) => 8 - i),
                 datasets: [{
                     label: 'Memory Usage',
-                    data: Array.from({ length: 9 }, () => Math.random() * 15),
+                    data: [], // Start with empty data
                     borderColor: '#FF9800',
                     backgroundColor: 'rgba(255, 152, 0, 0.2)',
                     borderWidth: 1,

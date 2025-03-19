@@ -81,5 +81,18 @@ def logs():
     log_data = '\n'.join(get_logs())
     return render_template('logs.html', log_data=log_data)
 
+@app.route('/get_chart_data', methods=['GET'])
+def get_chart_data():
+    # Read data from process_info.log
+    cpu_data = []
+    memory_data = []
+    with open('process_info.log', 'r') as f:
+        for line in f.read().split("\n"):
+            parts = line.split(' ')
+            if len(parts) == 2:  # Assuming the format is known
+                cpu_data.append(int(float(parts[0])))  # Assuming CPU usage is in the first column
+                memory_data.append(int(float(parts[1])))
+    return jsonify({'cpu': cpu_data, 'memory': memory_data})
+
 if __name__ == '__main__':
     app.run(debug=True)
