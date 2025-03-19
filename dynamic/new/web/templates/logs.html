@@ -54,9 +54,8 @@
         <p class="font-bold">
          Обращение к сетевым ресурсам
         </p>
-    <div class="grid grid-cols-2 gap-4 bg-gray-100 p-2 rounded" style="max-height: 400px; overflow-y: auto;" onload="scrollToBottom()">
+        <div class="grid grid-cols-2 gap-4 bg-gray-100 p-2 rounded" id='logContainer' style="max-height: 400px; overflow-y: auto;" onload="scrollToBottom()">
             <pre class="bg-gray-100 p-2 rounded" id="logData">{{ log_data }}</pre>
-
         </div>
        </div>
        <span class="bg-red-100 text-red-500 px-3 py-1 rounded-full">
@@ -338,6 +337,23 @@
             }
         }
     });
+
+    function scrollToBottom() {
+
+const logContainer = document.getElementById('logContainer');
+
+logContainer.scrollTop = logContainer.scrollHeight;
+
+}
+
+
+// Вызов функции прокрутки вниз при загрузке страницы
+
+window.onload = function() {
+
+scrollToBottom();
+
+};
   </script>
  </body>
 </html>
