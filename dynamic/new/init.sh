@@ -33,5 +33,5 @@ echo "Set iptables rule"
 sudo iptables -I OUTPUT -m owner --uid-owner `id -u vscext` -j LOG --log-prefix "VSCode : " --log-level 4
 
 echo "Run application and vscode"
-python web/app.py & firefox-esr http://127.0.0.1:5000/  & sudo -u vscext /home/vscext/asd/VSCode-linux-x64/./code --extensions-dir /home/`whoami`/.vscode/extensions/
+python web/get_sys_info.py & python web/app.py & firefox-esr http://127.0.0.1:5000/  & sudo -u vscext /home/vscext/asd/VSCode-linux-x64/./code --extensions-dir /home/`whoami`/.vscode/extensions/
 

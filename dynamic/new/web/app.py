@@ -78,8 +78,17 @@ def rules():
 
 @app.route('/logs')
 def logs():
-    log_data = '\n'.join(get_logs())
-    return render_template('logs.html', log_data=log_data)
+    netw = '\n'.join(get_logs())
+    with open("process_info.log", 'r') as f:
+        log_data = f.read()
+        f.close()
+    with open("files_read.log", 'r') as f:
+        read_files = f.read()
+        f.close()
+    with open("files_write.log", 'r') as f:
+        write_files = f.read()
+        f.close()
+    return render_template('logs.html', log_data=log_data, netw=netw, read_files=read_files, write_files=write_files)
 
 @app.route('/get_chart_data', methods=['GET'])
 def get_chart_data():

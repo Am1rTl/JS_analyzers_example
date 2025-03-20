@@ -27,15 +27,16 @@ def get_child_processes(pid):
         return []
 
 def monitor_strace_log(pid):
-    with open('process_info.log', 'a') as log_file:
-        while True:
-            time.sleep(1)  # Проверяем файл каждую секунду
-            if os.path.exists('/tmp/file_log'):
-                with open('/tmp/file_log', 'r') as strace_log:
+    all_files = []
+    run = 1
+    while run > 0 :
+        run -= 1
+        time.sleep(1)  # Проверяем файл каждую секунду
+        if os.path.exists('/tmp/asd/'):
+            for file in os.listdir("/tmp/asd"):
+                with open("/tmp/asd/"+file, 'r') as strace_log:
                     lines = strace_log.readlines()
                     for line in lines:
-                        log_file.write(line)
-                        log_file.flush()
 
                         #print(line)
                         if "read" in line:
@@ -45,10 +46,9 @@ def monitor_strace_log(pid):
                             try:
                                 child_fd_link = os.readlink(child_fd_path)
                                 if '/' in child_fd_link:
-                                    log_file.write('r' + child_fd_link)
+                                    all_files.append('r ' + child_fd_link)
                             except FileNotFoundError:
                                 continue
-                            log_file.flush()
 
                         elif "write" in line:
                             match = int(line.split("(")[1].split(",")[0])
@@ -57,26 +57,19 @@ def monitor_strace_log(pid):
                             try:
                                 child_fd_link = os.readlink(child_fd_path)
                                 if '/' in child_fd_link:
-                                    log_file.write('w' + child_fd_link)
+                                    all_files.append('w ' + child_fd_link)
                             except:
                                 print("Something went wrong")
-                            log_file.flush()
-    
 
-                        # Проверяем дочерние процессы
-                        child_processes = get_child_processes(pid)
-                        for child in child_processes:
-                            child_fd_info = f"/proc/{child.pid}/fd"
-                            if os.path.exists(child_fd_info):
-                                for child_fd in os.listdir(child_fd_info):
-                                    child_fd_path = os.path.join(child_fd_info, child_fd)
-                                    try:
-                                        child_fd_link = os.readlink(child_fd_path)
-                                        if '/' in child_fd_link:
-                                            log_file.write(f"{child.pid}: {child_fd_link}\n")
-                                    except:
-                                        continue
-                                log_file.flush()
+        with open('files_read.log', 'w') as read_file:
+            with open('files_write.log', 'w') as write_file:
+                all_files = list(set(all_files))
+                for i in all_files:
+                    if i[0] == 'r':
+                        read_file.write(i[2:] + '\n')
+                    else:
+                        write_file.write(i[2:] + '\n')
+                                
 
 if __name__ == "__main__":
     try:

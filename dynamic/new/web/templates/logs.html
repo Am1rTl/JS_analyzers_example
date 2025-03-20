@@ -48,7 +48,7 @@
                     <div>
                         <p class="font-bold">Обращение к сетевым ресурсам</p>
                         <div class="grid grid-cols-2 gap-4 bg-gray-100 p-2 rounded" id='logContainer' style="max-height: 400px; overflow-y: auto;">
-                            <pre class="bg-gray-100 p-2 rounded" id="logData">{{ log_data }}</pre>
+                            <pre class="bg-gray-100 p-2 rounded" id="logData">{{ netw }}</pre>
                         </div>
                     </div>
                     <span class="bg-red-100 text-red-500 px-3 py-1 rounded-full">HIGH</span>
@@ -59,15 +59,8 @@
                         <div class="grid grid-cols-2 gap-4 bg-gray-100 p-2 rounded">
                             <div>
                                 <p class="text-gray-600">
-                                    Пн 12 Янв 12:00:30 - Read - /path/to/file1.txt<br/>
-                                    Вт 13 Янв 12:05:45 - Read - /path/to/file2.txt<br/>
-                                    Ср 14 Янв 12:10:15 - Read - /path/to/file3.txt<br/>
-                                    Чт 15 Янв 12:15:50 - Read - /path/to/file4.txt<br/>
-                                    Пт 16 Янв 12:20:05 - Read - /path/to/file5.txt
+                                    <pre class="bg-gray-100 p-2 rounded" id="logData">{{ read_files }}</pre>
                                 </p>
-                            </div>
-                            <div>
-                                <p class="text-gray-600">Accepted<br/>Blocked<br/>Accepted<br/>Blocked<br/>Accepted</p>
                             </div>
                         </div>
                     </div>
@@ -79,15 +72,8 @@
                         <div class="grid grid-cols-2 gap-4 bg-gray-100 p-2 rounded">
                             <div>
                                 <p class="text-gray-600">
-                                    Пн 12 Янв 12:00:30 - Write - /path/to/file1.txt<br/>
-                                    Вт 13 Янв 12:05:45 - Write - /path/to/file2.txt<br/>
-                                    Ср 14 Янв 12:10:15 - Write - /path/to/file3.txt<br/>
-                                    Чт 15 Янв 12:15:50 - Write - /path/to/file4.txt<br/>
-                                    Пт 16 Янв 12:20:05 - Write - /path/to/file5.txt
+                                    <pre class="bg-gray-100 p-2 rounded" id="logData">{{ write_files }}</pre>
                                 </p>
-                            </div>
-                            <div>
-                                <p class="text-gray-600">Accepted<br/>Blocked<br/>Accepted<br/>Blocked<br/>Accepted</p>
                             </div>
                         </div>
                     </div>

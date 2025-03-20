@@ -2,7 +2,7 @@ def get_logs():
     import re
 
     # Sample log entries
-    with open("/tmp/asd", 'r') as f:
+    with open("/tmp/asda", 'r') as f:
         data = f.read()
     logs = data.split("\n")
     #print(logs)

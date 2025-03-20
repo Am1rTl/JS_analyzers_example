@@ -1,3 +1,4 @@
+import os
 import subprocess
 import psutil
 import time
@@ -26,12 +27,17 @@ def get_pid():
 
 pid = get_pid()
 print(pid)
-command = f"sudo strace -p {pid} -e trace=open,read,write -o /tmp/file_log "
+os.system("rm -rf /tmp/asd")
+os.system("mkdir /tmp/asd")
+command = f"sudo strace -p {pid} -e trace=open,read,write -o /tmp/asd/file_log "
 chils = get_child_processes(pid)
+pids = []
 for cpid in chils:
-    command += f" & sudo strace -p {cpid.pid} -e trace=open,read,write -o /tmp/file_log{cpid.pid} "
+    command += f" & sudo strace -p {cpid.pid} -e trace=open,read,write -o /tmp/asd/file_log{cpid.pid} "
+    pids.append(cpid.pid)
 
 print(command)
+print(len(pids))
 subprocess.run("sudo sysctl kernel.yama.ptrace_scope=0", shell=True)
 
 #command = f"sudo strace -p {pid} -e trace=open,read,write -o /tmp/file_log"
