@@ -105,5 +105,9 @@ def get_chart_data():
                 memory_data.append(int(float(parts[1])))
     return jsonify({'cpu': cpu_data, 'memory': memory_data})
 
+@app.route('/set_rule', methods=['GET'])
+def set_rule():
+    return render_template("configure_rules.html")
+
 if __name__ == '__main__':
     app.run(debug=True)

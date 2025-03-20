@@ -53,9 +53,10 @@ def monitor_process(pid):
             time.sleep(10)  # Ждем 10 секунд перед следующей проверкой
 
 if __name__ == "__main__":
-    try:
-        pid = get_pid()
-        print(f"PID получен, начинаю логирование процесса {pid}")
-        monitor_process(pid)
-    except ValueError:
-        print("Пожалуйста, введите корректный числовой PID.")
+    while True:
+        try:
+            pid = get_pid()
+            print(f"PID получен, начинаю логирование процесса {pid}")
+            monitor_process(pid)
+        except ValueError:
+            print("Пожалуйста, введите корректный числовой PID.")
