@@ -3,6 +3,7 @@ import subprocess
 import requests as r
 from flask import Flask, render_template, jsonify, request
 from format_logs import get_logs
+from strace import update_files_actions
 
 app = Flask(__name__)
 
@@ -78,6 +79,7 @@ def rules():
 
 @app.route('/logs')
 def logs():
+    update_files_actions()
     netw = '\n'.join(get_logs())
     with open("process_info.log", 'r') as f:
         log_data = f.read()
