@@ -27,7 +27,7 @@ def get_child_processes(pid):
         return []
 
 def monitor_strace_log(pid):
-    with open('process_info.log', 'w') as log_file:
+    with open('process_info.log', 'a') as log_file:
         while True:
             time.sleep(1)  # Проверяем файл каждую секунду
             if os.path.exists('/tmp/file_log'):
@@ -37,17 +37,17 @@ def monitor_strace_log(pid):
                         log_file.write(line)
                         log_file.flush()
 
-                        print(line)
+                        #print(line)
                         if "read" in line:
                             match = int(line.split("(")[1].split(",")[0])
                             fd = match
                             child_fd_path = f"/proc/{pid}/fd/{fd}"
                             try:
                                 child_fd_link = os.readlink(child_fd_path)
+                                if '/' in child_fd_link:
+                                    log_file.write('r' + child_fd_link)
                             except FileNotFoundError:
-                                log_file.write(f"Процесс {pid} имеет FD {fd}: файл не найден\n")
-                            else:
-                                log_file.write(f"Процесс {pid} имеет FD {fd}: {child_fd_link}\n")
+                                continue
                             log_file.flush()
 
                         elif "write" in line:
@@ -56,10 +56,10 @@ def monitor_strace_log(pid):
                             child_fd_path = f"/proc/{pid}/fd/{fd}"
                             try:
                                 child_fd_link = os.readlink(child_fd_path)
-                            except FileNotFoundError:
-                                log_file.write(f"Процесс {pid} имеет FD {fd}: файл не найден\n")
-                            else:
-                                log_file.write(f"Процесс {pid} имеет FD {fd}: {child_fd_link}\n")
+                                if '/' in child_fd_link:
+                                    log_file.write('w' + child_fd_link)
+                            except:
+                                print("Something went wrong")
                             log_file.flush()
     
 
@@ -72,10 +72,10 @@ def monitor_strace_log(pid):
                                     child_fd_path = os.path.join(child_fd_info, child_fd)
                                     try:
                                         child_fd_link = os.readlink(child_fd_path)
-                                    except FileNotFoundError:
-                                        log_file.write(f"Дочерний процесс {child.pid} имеет FD {child_fd}: файл не найден\n")
-                                    else:
-                                        log_file.write(f"Дочерний процесс {child.pid} имеет FD {child_fd}: {child_fd_link}\n")
+                                        if '/' in child_fd_link:
+                                            log_file.write(f"{child.pid}: {child_fd_link}\n")
+                                    except:
+                                        continue
                                 log_file.flush()
 
 if __name__ == "__main__":
