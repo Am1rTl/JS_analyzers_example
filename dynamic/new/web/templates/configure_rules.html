@@ -33,22 +33,22 @@
         <h1 class="text-5xl font-bold mb-8">Настройка правил</h1>
     </header>
     <main class="flex flex-col items-center mt-16 flex-grow">
-        <div class="flex gap-8 w-full max-w-4xl">
+        <div class="flex gap-8 w-full max-w-4xl" style="max-width: 75%;">
             <!-- Блок настройки сетевого трафика -->
             <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
-                <h2 class="text-3xl font-bold mb-6 text-gray-800">Правила сетевого трафика</h2>
+                <h2 class="text-3xl font-bold mb-6 text-gray-800">Сетевая активность</h2>
                 
                 <!-- Шаблоны -->
                 <div class="mb-6">
                     <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
                     <div class="space-y-2">
-                        <div id="template1" class="template p-4 rounded-lg" onclick="activateTemplate('template1')">
+                        <div id="template1" class="template p-4 rounded-lg" onclick="activateTemplate('template1', 'network')">
                             Шаблон 1: Блокировка всего трафика
                         </div>
-                        <div id="template2" class="template p-4 rounded-lg" onclick="activateTemplate('template2')">
+                        <div id="template2" class="template p-4 rounded-lg" onclick="activateTemplate('template2', 'network')">
                             Шаблон 2: Блокировка всего, кроме выбранных сайтов
                         </div>
-                        <div id="template3" class="template p-4 rounded-lg" onclick="activateTemplate('template3')">
+                        <div id="template3" class="template p-4 rounded-lg" onclick="activateTemplate('template3', 'network')">
                             Шаблон 3: Разрешить весь трафик
                         </div>
                     </div>
@@ -78,8 +78,24 @@
             <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
                 <h2 class="text-3xl font-bold mb-6 text-gray-800">Права на чтение файлов</h2>
 
+                <!-- Шаблоны для чтения -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
+                    <div class="space-y-2">
+                        <div id="readTemplate1" class="template p-4 rounded-lg" onclick="activateTemplate('readTemplate1', 'read')">
+                            Шаблон 1: Запретить чтение всех файлов
+                        </div>
+                        <div id="readTemplate2" class="template p-4 rounded-lg" onclick="activateTemplate('readTemplate2', 'read')">
+                            Шаблон 2: Разрешить чтение только выбранных файлов
+                        </div>
+                        <div id="readTemplate3" class="template p-4 rounded-lg" onclick="activateTemplate('readTemplate3', 'read')">
+                            Шаблон 3: Разрешить чтение всех файлов
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Настройки прав на чтение -->
-                <div id="readAccessSection">
+                <div id="readAccessSection" class="mb-4 hidden">
                     <label for="readAccess" class="block mb-2 text-gray-800">Разрешить чтение для:</label>
                     <div class="flex items-center gap-2">
                         <input 
@@ -97,6 +113,46 @@
                     <div id="addedReadAccess" class="mt-4 space-y-2"></div>
                 </div>
             </div>
+
+            <!-- Блок настройки прав на запись файлов -->
+            <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
+                <h2 class="text-3xl font-bold mb-6 text-gray-800">Права на запись файлов</h2>
+
+                <!-- Шаблоны для записи -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
+                    <div class="space-y-2">
+                        <div id="writeTemplate1" class="template p-4 rounded-lg" onclick="activateTemplate('writeTemplate1', 'write')">
+                            Шаблон 1: Запретить запись всех файлов
+                        </div>
+                        <div id="writeTemplate2" class="template p-4 rounded-lg" onclick="activateTemplate('writeTemplate2', 'write')">
+                            Шаблон 2: Разрешить запись только выбранных файлов
+                        </div>
+                        <div id="writeTemplate3" class="template p-4 rounded-lg" onclick="activateTemplate('writeTemplate3', 'write')">
+                            Шаблон 3: Разрешить запись всех файлов
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Настройки прав на запись -->
+                <div id="writeAccessSection" class="mb-4 hidden">
+                    <label for="writeAccess" class="block mb-2 text-gray-800">Разрешить запись для:</label>
+                    <div class="flex items-center gap-2">
+                        <input 
+                            type="text" 
+                            id="writeAccess" 
+                            placeholder="Введите путь к файлу или папке (через пробел или табуляцию)" 
+                            class="border rounded p-3 w-full text-gray-800" 
+                            onkeydown="handleKeyDown(event, 'writeAccess', 'addedWriteAccess')" 
+                        />
+                        <button onclick="addSite('writeAccess', 'addedWriteAccess')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <!-- Список добавленных путей -->
+                    <div id="addedWriteAccess" class="mt-4 space-y-2"></div>
+                </div>
+            </div>
         </div>
 
         <!-- Кнопка сохранения -->
@@ -109,9 +165,10 @@
     </footer>
 
     <script>
-        function activateTemplate(templateId) {
-            // Убираем активный класс у всех шаблонов
-            const templates = document.querySelectorAll('.template');
+        // Функция для активации шаблонов
+        function activateTemplate(templateId, blockType) {
+            // Убираем активный класс у всех шаблонов в текущем блоке
+            const templates = document.querySelectorAll(`.${blockType}-template`);
             templates.forEach(template => {
                 template.classList.remove('active');
             });
@@ -120,23 +177,49 @@
             const selectedTemplate = document.getElementById(templateId);
             selectedTemplate.classList.add('active');
 
-            // Управляем видимостью поля для ввода URL
-            const exceptionSection = document.getElementById('exceptionSection');
-
-            if (templateId === 'template1') {
-                // Шаблон 1: Блокировка всего трафика
-                exceptionSection.classList.add('hidden');
-                document.getElementById('exceptionSite').value = '';
-                document.getElementById('addedSites').innerHTML = ''; // Очищаем список сайтов
-            } else if (templateId === 'template2') {
-                // Шаблон 2: Блокировка всего, кроме выбранных сайтов
-                exceptionSection.classList.remove('hidden');
-                document.getElementById('exceptionSite').value = '';
-            } else if (templateId === 'template3') {
-                // Шаблон 3: Разрешить весь трафик
-                exceptionSection.classList.add('hidden');
-                document.getElementById('exceptionSite').value = '';
-                document.getElementById('addedSites').innerHTML = ''; // Очищаем список сайтов
+            // Управляем видимостью полей ввода в зависимости от шаблона
+            if (blockType === 'network') {
+                const exceptionSection = document.getElementById('exceptionSection');
+                if (templateId === 'template1') {
+                    exceptionSection.classList.add('hidden');
+                    document.getElementById('exceptionSite').value = '';
+                    document.getElementById('addedSites').innerHTML = '';
+                } else if (templateId === 'template2') {
+                    exceptionSection.classList.remove('hidden');
+                    document.getElementById('exceptionSite').value = '';
+                } else if (templateId === 'template3') {
+                    exceptionSection.classList.add('hidden');
+                    document.getElementById('exceptionSite').value = '';
+                    document.getElementById('addedSites').innerHTML = '';
+                }
+            } else if (blockType === 'read') {
+                const readAccessSection = document.getElementById('readAccessSection');
+                if (templateId === 'readTemplate1') {
+                    readAccessSection.classList.add('hidden');
+                    document.getElementById('readAccess').value = '';
+                    document.getElementById('addedReadAccess').innerHTML = '';
+                } else if (templateId === 'readTemplate2') {
+                    readAccessSection.classList.remove('hidden');
+                    document.getElementById('readAccess').value = '';
+                } else if (templateId === 'readTemplate3') {
+                    readAccessSection.classList.add('hidden');
+                    document.getElementById('readAccess').value = '';
+                    document.getElementById('addedReadAccess').innerHTML = '';
+                }
+            } else if (blockType === 'write') {
+                const writeAccessSection = document.getElementById('writeAccessSection');
+                if (templateId === 'writeTemplate1') {
+                    writeAccessSection.classList.add('hidden');
+                    document.getElementById('writeAccess').value = '';
+                    document.getElementById('addedWriteAccess').innerHTML = '';
+                } else if (templateId === 'writeTemplate2') {
+                    writeAccessSection.classList.remove('hidden');
+                    document.getElementById('writeAccess').value = '';
+                } else if (templateId === 'writeTemplate3') {
+                    writeAccessSection.classList.add('hidden');
+                    document.getElementById('writeAccess').value = '';
+                    document.getElementById('addedWriteAccess').innerHTML = '';
+                }
             }
         }
 
