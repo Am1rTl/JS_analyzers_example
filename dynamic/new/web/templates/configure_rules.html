@@ -55,9 +55,9 @@
         <h1 class="text-5xl font-bold mb-8">Настройка правил</h1>
     </header>
     <main class="flex flex-col items-center mt-16 flex-grow">
-        <div class="flex gap-8 w-full max-w-4xl flex-wrap" style="max-width: 90%;">
+        <div class="grid grid-cols-2 gap-8 w-full max-w-4xl" style="max-width: 90%;">
             <!-- Блок настройки сетевого трафика -->
-            <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
+            <div class="bg-white p-10 rounded-lg shadow-lg w-full">
                 <h2 class="text-3xl font-bold mb-6 text-gray-800">Сетевая активность</h2>
                 <!-- Выбор действия -->
                 <div class="mb-6">
@@ -159,8 +159,9 @@
             </div>
 
             <!-- Блок настройки прав на чтение файлов -->
-            <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
+            <div class="bg-white p-10 rounded-lg shadow-lg w-full">
                 <h2 class="text-3xl font-bold mb-6 text-gray-800">Права на чтение файлов</h2>
+                <button class="action-button" onclick="toggleFileReadRestriction()">Запретить чтение выбранных файлов</button>
                 <!-- Шаблоны для чтения -->
                 <div class="mb-6">
                     <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
@@ -209,8 +210,9 @@
             </div>
 
             <!-- Блок настройки прав на запись файлов -->
-            <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
+            <div class="bg-white p-10 rounded-lg shadow-lg w-full">
                 <h2 class="text-3xl font-bold mb-6 text-gray-800">Права на запись файлов</h2>
+                <button class="action-button" onclick="toggleFileWriteRestriction()">Запретить запись выбранных файлов</button>
                 <!-- Шаблоны для записи -->
                 <div class="mb-6">
                     <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
@@ -259,8 +261,15 @@
             </div>
 
             <!-- Блок настройки прав на использование ресурсов -->
-            <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
+            <div class="bg-white p-10 rounded-lg shadow-lg w-full">
                 <h2 class="text-3xl font-bold mb-6 text-gray-800">Права на использование ресурсов</h2>
+                <label for="resourcePercentageInput" class="block mb-2 text-gray-800">Процент использования ресурсов:</label>
+                <input 
+                    type="number" 
+                    id="resourcePercentageInput" 
+                    placeholder="Введите процент" 
+                    class="border rounded p-3 w-full text-gray-800" 
+                />
                 <!-- Шаблоны для использования ресурсов -->
                 <div class="mb-6">
                     <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
