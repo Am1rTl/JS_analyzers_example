@@ -55,7 +55,7 @@
         <h1 class="text-5xl font-bold mb-8">Настройка правил</h1>
     </header>
     <main class="flex flex-col items-center mt-16 flex-grow">
-        <div class="flex gap-8 w-full max-w-4xl" style="max-width: 75%;">
+        <div class="flex gap-8 w-full max-w-4xl flex-wrap" style="max-width: 90%;">
             <!-- Блок настройки сетевого трафика -->
             <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
                 <h2 class="text-3xl font-bold mb-6 text-gray-800">Сетевая активность</h2>
@@ -157,6 +157,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Блок настройки прав на чтение файлов -->
             <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
                 <h2 class="text-3xl font-bold mb-6 text-gray-800">Права на чтение файлов</h2>
@@ -206,6 +207,132 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Блок настройки прав на запись файлов -->
+            <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
+                <h2 class="text-3xl font-bold mb-6 text-gray-800">Права на запись файлов</h2>
+                <!-- Шаблоны для записи -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
+                    <div class="space-y-2">
+                        <div id="writeTemplate1" class="template p-4 rounded-lg" onclick="selectWriteAction('blockAll')">
+                            Шаблон 1: Запретить запись всех файлов
+                        </div>
+                        <div id="writeTemplate2" class="template p-4 rounded-lg" onclick="selectWriteAction('custom')">
+                            Шаблон 2: Разрешить запись только выбранных файлов
+                        </div>
+                        <div id="writeTemplate3" class="template p-4 rounded-lg" onclick="selectWriteAction('allowAll')">
+                            Шаблон 3: Разрешить запись всех файлов
+                        </div>
+                    </div>
+                </div>
+                <!-- Настройки правил фильтрации -->
+                <div id="writeCustomRulesSection" class="mb-4 hidden">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Настройте правила:</h3>
+                    <!-- Фильтрация по файлам -->
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-4">
+                            <button id="blockWriteFileButton" class="action-button active" onclick="toggleAction('blockWriteFileButton', 'allowWriteFileButton', 'block')">
+                                Заблокировать всё с
+                            </button>
+                            <button id="allowWriteFileButton" class="action-button inactive" onclick="toggleAction('allowWriteFileButton', 'blockWriteFileButton', 'allow')">
+                                Разрешить всё с
+                            </button>
+                        </div>
+                        <label for="writeFileInput" class="block mb-2 text-gray-800">Файл или папка:</label>
+                        <div class="flex items-center gap-2">
+                            <input 
+                                type="text" 
+                                id="writeFileInput" 
+                                placeholder="Введите путь к файлу или папке" 
+                                class="border rounded p-3 w-full text-gray-800" 
+                                onkeydown="handleKeyDown(event, 'writeFileInput', 'addedWriteFiles')" 
+                            />
+                            <button onclick="addSite('writeFileInput', 'addedWriteFiles')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <!-- Список добавленных файлов -->
+                        <div id="addedWriteFiles" class="mt-4 space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Блок настройки прав на использование ресурсов -->
+            <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
+                <h2 class="text-3xl font-bold mb-6 text-gray-800">Права на использование ресурсов</h2>
+                <!-- Шаблоны для использования ресурсов -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
+                    <div class="space-y-2">
+                        <div id="resourceTemplate1" class="template p-4 rounded-lg" onclick="selectResourceAction('blockAll')">
+                            Шаблон 1: Запретить использование всех ресурсов
+                        </div>
+                        <div id="resourceTemplate2" class="template p-4 rounded-lg" onclick="selectResourceAction('custom')">
+                            Шаблон 2: Разрешить использование только выбранных ресурсов
+                        </div>
+                        <div id="resourceTemplate3" class="template p-4 rounded-lg" onclick="selectResourceAction('allowAll')">
+                            Шаблон 3: Разрешить использование всех ресурсов
+                        </div>
+                    </div>
+                </div>
+                <!-- Настройки правил фильтрации -->
+                <div id="resourceCustomRulesSection" class="mb-4 hidden">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Настройте правила:</h3>
+                    <!-- Фильтрация по оперативной памяти -->
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-4">
+                            <button id="blockMemoryButton" class="action-button active" onclick="toggleAction('blockMemoryButton', 'allowMemoryButton', 'block')">
+                                Заблокировать использование памяти
+                            </button>
+                            <button id="allowMemoryButton" class="action-button inactive" onclick="toggleAction('allowMemoryButton', 'blockMemoryButton', 'allow')">
+                                Разрешить использование памяти
+                            </button>
+                        </div>
+                        <label for="memoryInput" class="block mb-2 text-gray-800">Лимит памяти (МБ):</label>
+                        <div class="flex items-center gap-2">
+                            <input 
+                                type="number" 
+                                id="memoryInput" 
+                                placeholder="Введите лимит памяти" 
+                                class="border rounded p-3 w-full text-gray-800" 
+                                onkeydown="handleKeyDown(event, 'memoryInput', 'addedMemoryLimits')" 
+                            />
+                            <button onclick="addSite('memoryInput', 'addedMemoryLimits')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <!-- Список добавленных лимитов памяти -->
+                        <div id="addedMemoryLimits" class="mt-4 space-y-2"></div>
+                    </div>
+                    <!-- Фильтрация по процессору -->
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-4">
+                            <button id="blockCpuButton" class="action-button active" onclick="toggleAction('blockCpuButton', 'allowCpuButton', 'block')">
+                                Заблокировать использование процессора
+                            </button>
+                            <button id="allowCpuButton" class="action-button inactive" onclick="toggleAction('allowCpuButton', 'blockCpuButton', 'allow')">
+                                Разрешить использование процессора
+                            </button>
+                        </div>
+                        <label for="cpuInput" class="block mb-2 text-gray-800">Лимит процессора (%):</label>
+                        <div class="flex items-center gap-2">
+                            <input 
+                                type="number" 
+                                id="cpuInput" 
+                                placeholder="Введите лимит процессора" 
+                                class="border rounded p-3 w-full text-gray-800" 
+                                onkeydown="handleKeyDown(event, 'cpuInput', 'addedCpuLimits')" 
+                            />
+                            <button onclick="addSite('cpuInput', 'addedCpuLimits')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <!-- Список добавленных лимитов процессора -->
+                        <div id="addedCpuLimits" class="mt-4 space-y-2"></div>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- Кнопка сохранения -->
         <button class="bg-purple-600 text-white py-3 px-6 rounded-full hover:bg-purple-700 transition mt-8">
@@ -249,6 +376,42 @@
             } else if (action === 'custom') {
                 document.getElementById('readTemplate2').classList.add('active');
                 document.getElementById('readCustomRulesSection').classList.remove('hidden');
+            }
+        }
+
+        // Функция для выбора действия в правах на запись файлов
+        function selectWriteAction(action) {
+            const writeTemplates = document.querySelectorAll('#writeTemplate1, #writeTemplate2, #writeTemplate3');
+            writeTemplates.forEach(template => {
+                template.classList.remove('active');
+            });
+            if (action === 'blockAll') {
+                document.getElementById('writeTemplate1').classList.add('active');
+                document.getElementById('writeCustomRulesSection').classList.add('hidden');
+            } else if (action === 'allowAll') {
+                document.getElementById('writeTemplate3').classList.add('active');
+                document.getElementById('writeCustomRulesSection').classList.add('hidden');
+            } else if (action === 'custom') {
+                document.getElementById('writeTemplate2').classList.add('active');
+                document.getElementById('writeCustomRulesSection').classList.remove('hidden');
+            }
+        }
+
+        // Функция для выбора действия в правах на использование ресурсов
+        function selectResourceAction(action) {
+            const resourceTemplates = document.querySelectorAll('#resourceTemplate1, #resourceTemplate2, #resourceTemplate3');
+            resourceTemplates.forEach(template => {
+                template.classList.remove('active');
+            });
+            if (action === 'blockAll') {
+                document.getElementById('resourceTemplate1').classList.add('active');
+                document.getElementById('resourceCustomRulesSection').classList.add('hidden');
+            } else if (action === 'allowAll') {
+                document.getElementById('resourceTemplate3').classList.add('active');
+                document.getElementById('resourceCustomRulesSection').classList.add('hidden');
+            } else if (action === 'custom') {
+                document.getElementById('resourceTemplate2').classList.add('active');
+                document.getElementById('resourceCustomRulesSection').classList.remove('hidden');
             }
         }
 
