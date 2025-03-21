@@ -26,6 +26,28 @@
         .hidden {
             display: none;
         }
+
+        /* Стили для кнопок "Блокировать всё" и "Разрешить всё" */
+        .action-button {
+            transition: all 0.3s ease;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .action-button.active {
+            background: linear-gradient(135deg, #FF4D4D, #FF7878); /* Красный градиент для блокировки */
+            color: white;
+        }
+        .action-button.allow-active {
+            background: linear-gradient(135deg, #6EE7B7, #3B82F6); /* Зеленый градиент для разрешения */
+            color: white;
+        }
+        .action-button.inactive {
+            opacity: 0.6;
+            background: #E5E7EB;
+            color: #6B7280;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-b from-purple-500 to-blue-500 text-white min-h-screen flex flex-col">
@@ -58,10 +80,10 @@
                     <!-- Фильтрация по подстроке -->
                     <div class="mb-4">
                         <div class="flex justify-between mb-4">
-                            <button onclick="setSubstringAction('block')" class="bg-red-500 text-white p-3 rounded-lg hover:bg-red-600 transition">
+                            <button id="blockSubstringButton" class="action-button active" onclick="toggleAction('blockSubstringButton', 'allowSubstringButton', 'block')">
                                 Блокировать всё с
                             </button>
-                            <button onclick="setSubstringAction('allow')" class="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition">
+                            <button id="allowSubstringButton" class="action-button inactive" onclick="toggleAction('allowSubstringButton', 'blockSubstringButton', 'allow')">
                                 Разрешить всё с
                             </button>
                         </div>
@@ -83,6 +105,14 @@
                     </div>
                     <!-- Фильтрация по порту -->
                     <div class="mb-4">
+                        <div class="flex justify-between mb-4">
+                            <button id="blockPortButton" class="action-button active" onclick="toggleAction('blockPortButton', 'allowPortButton', 'block')">
+                                Блокировать всё с
+                            </button>
+                            <button id="allowPortButton" class="action-button inactive" onclick="toggleAction('allowPortButton', 'blockPortButton', 'allow')">
+                                Разрешить всё с
+                            </button>
+                        </div>
                         <label for="portInput" class="block mb-2 text-gray-800">Порт:</label>
                         <div class="flex items-center gap-2">
                             <input 
@@ -98,6 +128,32 @@
                         </div>
                         <!-- Список добавленных портов -->
                         <div id="addedPorts" class="mt-4 space-y-2"></div>
+                    </div>
+                    <!-- Фильтрация по IP -->
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-4">
+                            <button id="blockIpButton" class="action-button active" onclick="toggleAction('blockIpButton', 'allowIpButton', 'block')">
+                                Блокировать всё с
+                            </button>
+                            <button id="allowIpButton" class="action-button inactive" onclick="toggleAction('allowIpButton', 'blockIpButton', 'allow')">
+                                Разрешить всё с
+                            </button>
+                        </div>
+                        <label for="ipInput" class="block mb-2 text-gray-800">IP-адрес:</label>
+                        <div class="flex items-center gap-2">
+                            <input 
+                                type="text" 
+                                id="ipInput" 
+                                placeholder="Введите IP-адрес" 
+                                class="border rounded p-3 w-full text-gray-800" 
+                                onkeydown="handleKeyDown(event, 'ipInput', 'addedIps')" 
+                            />
+                            <button onclick="addSite('ipInput', 'addedIps')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <!-- Список добавленных IP -->
+                        <div id="addedIps" class="mt-4 space-y-2"></div>
                     </div>
                 </div>
             </div>
@@ -150,12 +206,10 @@
     <script>
         // Функция для выбора действия в сетевых настройках
         function selectNetworkAction(action) {
-            // Убираем активный класс у всех действий
             const actions = document.querySelectorAll('.template');
             actions.forEach(template => {
                 template.classList.remove('active');
             });
-            // Добавляем активный класс только выбранному действию
             if (action === 'allowAll') {
                 document.getElementById('allowAllTraffic').classList.add('active');
                 document.getElementById('customRulesSection').classList.add('hidden');
@@ -167,15 +221,28 @@
                 document.getElementById('customRulesSection').classList.remove('hidden');
             }
         }
+
+        // Функция для переключения состояния кнопок
+        function toggleAction(activeButtonId, inactiveButtonId, action) {
+            const activeButton = document.getElementById(activeButtonId);
+            const inactiveButton = document.getElementById(inactiveButtonId);
+
+            activeButton.classList.add(action === 'block' ? 'active' : 'allow-active');
+            activeButton.classList.remove('inactive');
+
+            inactiveButton.classList.add('inactive');
+            inactiveButton.classList.remove('active', 'allow-active');
+
+            alert(`Установлено действие: ${action === 'block' ? 'Блокировать всё' : 'Разрешить всё'}`);
+        }
+
         // Функция для добавления элементов
         function addSite(inputId, listId) {
             const input = document.getElementById(inputId);
             const items = input.value.trim();
             if (items) {
                 const addedItems = document.getElementById(listId);
-                // Разделяем введённые элементы по пробелам или табуляции
                 const elements = items.split(/[\s\t]+/).filter(item => item.trim() !== '');
-                // Добавляем каждый элемент в список
                 elements.forEach(item => {
                     const itemElement = document.createElement('div');
                     itemElement.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
@@ -187,26 +254,21 @@
                     `;
                     addedItems.appendChild(itemElement);
                 });
-                // Очищаем поле ввода
                 input.value = '';
             }
         }
+
         // Функция для удаления элемента
         function removeSite(button) {
             const itemElement = button.closest('div');
             itemElement.remove();
         }
+
         // Обработчик нажатия клавиши Enter
         function handleKeyDown(event, inputId, listId) {
             if (event.key === 'Enter') {
-                addSite(inputId, listId); // Добавляем элементы при нажатии Enter
+                addSite(inputId, listId);
             }
-        }
-        // Функция для установки действия по подстроке
-        let currentSubstringAction = 'block'; // По умолчанию блокировка
-        function setSubstringAction(action) {
-            currentSubstringAction = action;
-            alert(`Установлено действие: ${action === 'block' ? 'Блокировать всё с' : 'Разрешить всё с'}`);
         }
     </script>
 </body>
