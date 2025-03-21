@@ -218,8 +218,8 @@
     <script>
         // Функция для выбора действия в сетевых настройках
         function selectNetworkAction(action) {
-            const actions = document.querySelectorAll('.template');
-            actions.forEach(template => {
+            const networkTemplates = document.querySelectorAll('#allowAllTraffic, #blockAllTraffic, #customRules');
+            networkTemplates.forEach(template => {
                 template.classList.remove('active');
             });
             if (action === 'allowAll') {
@@ -236,8 +236,8 @@
 
         // Функция для выбора действия в правах на чтение файлов
         function selectReadAction(action) {
-            const templates = document.querySelectorAll('.template');
-            templates.forEach(template => {
+            const readTemplates = document.querySelectorAll('#readTemplate1, #readTemplate2, #readTemplate3');
+            readTemplates.forEach(template => {
                 template.classList.remove('active');
             });
             if (action === 'blockAll') {
