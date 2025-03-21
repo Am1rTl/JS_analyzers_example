@@ -37,47 +37,73 @@
             <!-- Блок настройки сетевого трафика -->
             <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
                 <h2 class="text-3xl font-bold mb-6 text-gray-800">Сетевая активность</h2>
-                
-                <!-- Шаблоны -->
+                <!-- Выбор действия -->
                 <div class="mb-6">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите действие:</h3>
                     <div class="space-y-2">
-                        <div id="template1" class="template p-4 rounded-lg" onclick="activateTemplate('template1', 'network')">
-                            Шаблон 1: Блокировка всего трафика
+                        <div id="allowAllTraffic" class="template p-4 rounded-lg" onclick="selectNetworkAction('allowAll')">
+                            Разрешить весь трафик
                         </div>
-                        <div id="template2" class="template p-4 rounded-lg" onclick="activateTemplate('template2', 'network')">
-                            Шаблон 2: Блокировка всего, кроме выбранных сайтов
+                        <div id="blockAllTraffic" class="template p-4 rounded-lg" onclick="selectNetworkAction('blockAll')">
+                            Заблокировать весь трафик
                         </div>
-                        <div id="template3" class="template p-4 rounded-lg" onclick="activateTemplate('template3', 'network')">
-                            Шаблон 3: Разрешить весь трафик
+                        <div id="customRules" class="template p-4 rounded-lg" onclick="selectNetworkAction('custom')">
+                            Настроить правила фильтрации
                         </div>
                     </div>
                 </div>
-
-                <!-- Настройки сетевого трафика -->
-                <div id="exceptionSection" class="mb-4 hidden">
-                    <label for="exceptionSite" class="block mb-2 text-gray-800">Исключение (блокировать всё, кроме):</label>
-                    <div class="flex items-center gap-2">
-                        <input 
-                            type="text" 
-                            id="exceptionSite" 
-                            placeholder="Введите URL сайта (через пробел или табуляцию)" 
-                            class="border rounded p-3 w-full text-gray-800" 
-                            onkeydown="handleKeyDown(event, 'exceptionSite', 'addedSites')" 
-                        />
-                        <button onclick="addSite('exceptionSite', 'addedSites')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
-                            <i class="fas fa-plus"></i>
-                        </button>
+                <!-- Настройки правил фильтрации -->
+                <div id="customRulesSection" class="mb-4 hidden">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Настройте правила:</h3>
+                    <!-- Фильтрация по подстроке -->
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-4">
+                            <button onclick="setSubstringAction('block')" class="bg-red-500 text-white p-3 rounded-lg hover:bg-red-600 transition">
+                                Блокировать всё с
+                            </button>
+                            <button onclick="setSubstringAction('allow')" class="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition">
+                                Разрешить всё с
+                            </button>
+                        </div>
+                        <label for="substringInput" class="block mb-2 text-gray-800">Подстрока:</label>
+                        <div class="flex items-center gap-2">
+                            <input 
+                                type="text" 
+                                id="substringInput" 
+                                placeholder="Введите подстроку" 
+                                class="border rounded p-3 w-full text-gray-800" 
+                                onkeydown="handleKeyDown(event, 'substringInput', 'addedSubstrings')" 
+                            />
+                            <button onclick="addSite('substringInput', 'addedSubstrings')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <!-- Список добавленных подстрок -->
+                        <div id="addedSubstrings" class="mt-4 space-y-2"></div>
                     </div>
-                    <!-- Список добавленных сайтов -->
-                    <div id="addedSites" class="mt-4 space-y-2"></div>
+                    <!-- Фильтрация по порту -->
+                    <div class="mb-4">
+                        <label for="portInput" class="block mb-2 text-gray-800">Порт:</label>
+                        <div class="flex items-center gap-2">
+                            <input 
+                                type="number" 
+                                id="portInput" 
+                                placeholder="Введите номер порта" 
+                                class="border rounded p-3 w-full text-gray-800" 
+                                onkeydown="handleKeyDown(event, 'portInput', 'addedPorts')" 
+                            />
+                            <button onclick="addSite('portInput', 'addedPorts')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <!-- Список добавленных портов -->
+                        <div id="addedPorts" class="mt-4 space-y-2"></div>
+                    </div>
                 </div>
             </div>
-
             <!-- Блок настройки прав на чтение файлов -->
             <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
                 <h2 class="text-3xl font-bold mb-6 text-gray-800">Права на чтение файлов</h2>
-
                 <!-- Шаблоны для чтения -->
                 <div class="mb-6">
                     <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
@@ -93,7 +119,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Настройки прав на чтение -->
                 <div id="readAccessSection" class="mb-4 hidden">
                     <label for="readAccess" class="block mb-2 text-gray-800">Разрешить чтение для:</label>
@@ -113,48 +138,7 @@
                     <div id="addedReadAccess" class="mt-4 space-y-2"></div>
                 </div>
             </div>
-
-            <!-- Блок настройки прав на запись файлов -->
-            <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
-                <h2 class="text-3xl font-bold mb-6 text-gray-800">Права на запись файлов</h2>
-
-                <!-- Шаблоны для записи -->
-                <div class="mb-6">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
-                    <div class="space-y-2">
-                        <div id="writeTemplate1" class="template p-4 rounded-lg" onclick="activateTemplate('writeTemplate1', 'write')">
-                            Шаблон 1: Запретить запись всех файлов
-                        </div>
-                        <div id="writeTemplate2" class="template p-4 rounded-lg" onclick="activateTemplate('writeTemplate2', 'write')">
-                            Шаблон 2: Разрешить запись только выбранных файлов
-                        </div>
-                        <div id="writeTemplate3" class="template p-4 rounded-lg" onclick="activateTemplate('writeTemplate3', 'write')">
-                            Шаблон 3: Разрешить запись всех файлов
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Настройки прав на запись -->
-                <div id="writeAccessSection" class="mb-4 hidden">
-                    <label for="writeAccess" class="block mb-2 text-gray-800">Разрешить запись для:</label>
-                    <div class="flex items-center gap-2">
-                        <input 
-                            type="text" 
-                            id="writeAccess" 
-                            placeholder="Введите путь к файлу или папке (через пробел или табуляцию)" 
-                            class="border rounded p-3 w-full text-gray-800" 
-                            onkeydown="handleKeyDown(event, 'writeAccess', 'addedWriteAccess')" 
-                        />
-                        <button onclick="addSite('writeAccess', 'addedWriteAccess')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                    <!-- Список добавленных путей -->
-                    <div id="addedWriteAccess" class="mt-4 space-y-2"></div>
-                </div>
-            </div>
         </div>
-
         <!-- Кнопка сохранения -->
         <button class="bg-purple-600 text-white py-3 px-6 rounded-full hover:bg-purple-700 transition mt-8">
             Сохранить настройки
@@ -163,77 +147,34 @@
     <footer class="bg-white text-black py-4 mt-16 w-full text-center">
         <p>© 2023 Настройка правил</p>
     </footer>
-
     <script>
-        // Функция для активации шаблонов
-        function activateTemplate(templateId, blockType) {
-            // Убираем активный класс у всех шаблонов в текущем блоке
-            const templates = document.querySelectorAll(`.${blockType}-template`);
-            templates.forEach(template => {
+        // Функция для выбора действия в сетевых настройках
+        function selectNetworkAction(action) {
+            // Убираем активный класс у всех действий
+            const actions = document.querySelectorAll('.template');
+            actions.forEach(template => {
                 template.classList.remove('active');
             });
-
-            // Добавляем активный класс только выбранному шаблону
-            const selectedTemplate = document.getElementById(templateId);
-            selectedTemplate.classList.add('active');
-
-            // Управляем видимостью полей ввода в зависимости от шаблона
-            if (blockType === 'network') {
-                const exceptionSection = document.getElementById('exceptionSection');
-                if (templateId === 'template1') {
-                    exceptionSection.classList.add('hidden');
-                    document.getElementById('exceptionSite').value = '';
-                    document.getElementById('addedSites').innerHTML = '';
-                } else if (templateId === 'template2') {
-                    exceptionSection.classList.remove('hidden');
-                    document.getElementById('exceptionSite').value = '';
-                } else if (templateId === 'template3') {
-                    exceptionSection.classList.add('hidden');
-                    document.getElementById('exceptionSite').value = '';
-                    document.getElementById('addedSites').innerHTML = '';
-                }
-            } else if (blockType === 'read') {
-                const readAccessSection = document.getElementById('readAccessSection');
-                if (templateId === 'readTemplate1') {
-                    readAccessSection.classList.add('hidden');
-                    document.getElementById('readAccess').value = '';
-                    document.getElementById('addedReadAccess').innerHTML = '';
-                } else if (templateId === 'readTemplate2') {
-                    readAccessSection.classList.remove('hidden');
-                    document.getElementById('readAccess').value = '';
-                } else if (templateId === 'readTemplate3') {
-                    readAccessSection.classList.add('hidden');
-                    document.getElementById('readAccess').value = '';
-                    document.getElementById('addedReadAccess').innerHTML = '';
-                }
-            } else if (blockType === 'write') {
-                const writeAccessSection = document.getElementById('writeAccessSection');
-                if (templateId === 'writeTemplate1') {
-                    writeAccessSection.classList.add('hidden');
-                    document.getElementById('writeAccess').value = '';
-                    document.getElementById('addedWriteAccess').innerHTML = '';
-                } else if (templateId === 'writeTemplate2') {
-                    writeAccessSection.classList.remove('hidden');
-                    document.getElementById('writeAccess').value = '';
-                } else if (templateId === 'writeTemplate3') {
-                    writeAccessSection.classList.add('hidden');
-                    document.getElementById('writeAccess').value = '';
-                    document.getElementById('addedWriteAccess').innerHTML = '';
-                }
+            // Добавляем активный класс только выбранному действию
+            if (action === 'allowAll') {
+                document.getElementById('allowAllTraffic').classList.add('active');
+                document.getElementById('customRulesSection').classList.add('hidden');
+            } else if (action === 'blockAll') {
+                document.getElementById('blockAllTraffic').classList.add('active');
+                document.getElementById('customRulesSection').classList.add('hidden');
+            } else if (action === 'custom') {
+                document.getElementById('customRules').classList.add('active');
+                document.getElementById('customRulesSection').classList.remove('hidden');
             }
         }
-
         // Функция для добавления элементов
         function addSite(inputId, listId) {
             const input = document.getElementById(inputId);
             const items = input.value.trim();
-
             if (items) {
                 const addedItems = document.getElementById(listId);
-
                 // Разделяем введённые элементы по пробелам или табуляции
                 const elements = items.split(/[\s\t]+/).filter(item => item.trim() !== '');
-
                 // Добавляем каждый элемент в список
                 elements.forEach(item => {
                     const itemElement = document.createElement('div');
@@ -246,23 +187,26 @@
                     `;
                     addedItems.appendChild(itemElement);
                 });
-
                 // Очищаем поле ввода
                 input.value = '';
             }
         }
-
         // Функция для удаления элемента
         function removeSite(button) {
             const itemElement = button.closest('div');
             itemElement.remove();
         }
-
         // Обработчик нажатия клавиши Enter
         function handleKeyDown(event, inputId, listId) {
             if (event.key === 'Enter') {
                 addSite(inputId, listId); // Добавляем элементы при нажатии Enter
             }
+        }
+        // Функция для установки действия по подстроке
+        let currentSubstringAction = 'block'; // По умолчанию блокировка
+        function setSubstringAction(action) {
+            currentSubstringAction = action;
+            alert(`Установлено действие: ${action === 'block' ? 'Блокировать всё с' : 'Разрешить всё с'}`);
         }
     </script>
 </body>
