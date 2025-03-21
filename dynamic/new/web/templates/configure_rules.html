@@ -164,34 +164,46 @@
                 <div class="mb-6">
                     <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
                     <div class="space-y-2">
-                        <div id="readTemplate1" class="template p-4 rounded-lg" onclick="activateTemplate('readTemplate1', 'read')">
+                        <div id="readTemplate1" class="template p-4 rounded-lg" onclick="selectReadAction('blockAll')">
                             Шаблон 1: Запретить чтение всех файлов
                         </div>
-                        <div id="readTemplate2" class="template p-4 rounded-lg" onclick="activateTemplate('readTemplate2', 'read')">
+                        <div id="readTemplate2" class="template p-4 rounded-lg" onclick="selectReadAction('custom')">
                             Шаблон 2: Разрешить чтение только выбранных файлов
                         </div>
-                        <div id="readTemplate3" class="template p-4 rounded-lg" onclick="activateTemplate('readTemplate3', 'read')">
+                        <div id="readTemplate3" class="template p-4 rounded-lg" onclick="selectReadAction('allowAll')">
                             Шаблон 3: Разрешить чтение всех файлов
                         </div>
                     </div>
                 </div>
-                <!-- Настройки прав на чтение -->
-                <div id="readAccessSection" class="mb-4 hidden">
-                    <label for="readAccess" class="block mb-2 text-gray-800">Разрешить чтение для:</label>
-                    <div class="flex items-center gap-2">
-                        <input 
-                            type="text" 
-                            id="readAccess" 
-                            placeholder="Введите путь к файлу или папке (через пробел или табуляцию)" 
-                            class="border rounded p-3 w-full text-gray-800" 
-                            onkeydown="handleKeyDown(event, 'readAccess', 'addedReadAccess')" 
-                        />
-                        <button onclick="addSite('readAccess', 'addedReadAccess')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
-                            <i class="fas fa-plus"></i>
-                        </button>
+                <!-- Настройки правил фильтрации -->
+                <div id="readCustomRulesSection" class="mb-4 hidden">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Настройте правила:</h3>
+                    <!-- Фильтрация по файлам -->
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-4">
+                            <button id="blockFileButton" class="action-button active" onclick="toggleAction('blockFileButton', 'allowFileButton', 'block')">
+                                Заблокировать всё с
+                            </button>
+                            <button id="allowFileButton" class="action-button inactive" onclick="toggleAction('allowFileButton', 'blockFileButton', 'allow')">
+                                Разрешить всё с
+                            </button>
+                        </div>
+                        <label for="fileInput" class="block mb-2 text-gray-800">Файл или папка:</label>
+                        <div class="flex items-center gap-2">
+                            <input 
+                                type="text" 
+                                id="fileInput" 
+                                placeholder="Введите путь к файлу или папке" 
+                                class="border rounded p-3 w-full text-gray-800" 
+                                onkeydown="handleKeyDown(event, 'fileInput', 'addedFiles')" 
+                            />
+                            <button onclick="addSite('fileInput', 'addedFiles')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <!-- Список добавленных файлов -->
+                        <div id="addedFiles" class="mt-4 space-y-2"></div>
                     </div>
-                    <!-- Список добавленных путей -->
-                    <div id="addedReadAccess" class="mt-4 space-y-2"></div>
                 </div>
             </div>
         </div>
@@ -222,6 +234,24 @@
             }
         }
 
+        // Функция для выбора действия в правах на чтение файлов
+        function selectReadAction(action) {
+            const templates = document.querySelectorAll('.template');
+            templates.forEach(template => {
+                template.classList.remove('active');
+            });
+            if (action === 'blockAll') {
+                document.getElementById('readTemplate1').classList.add('active');
+                document.getElementById('readCustomRulesSection').classList.add('hidden');
+            } else if (action === 'allowAll') {
+                document.getElementById('readTemplate3').classList.add('active');
+                document.getElementById('readCustomRulesSection').classList.add('hidden');
+            } else if (action === 'custom') {
+                document.getElementById('readTemplate2').classList.add('active');
+                document.getElementById('readCustomRulesSection').classList.remove('hidden');
+            }
+        }
+
         // Функция для переключения состояния кнопок
         function toggleAction(activeButtonId, inactiveButtonId, action) {
             const activeButton = document.getElementById(activeButtonId);
@@ -232,16 +262,23 @@
 
             inactiveButton.classList.add('inactive');
             inactiveButton.classList.remove('active', 'allow-active');
+
+            alert(`Установлено действие: ${action === 'block' ? 'Заблокировать всё с' : 'Разрешить всё с'}`);
         }
 
         // Функция для добавления элементов
         function addSite(inputId, listId) {
             const input = document.getElementById(inputId);
             const items = input.value.trim();
-            if (items) {
-                const addedItems = document.getElementById(listId);
-                const elements = items.split(/[\s\t]+/).filter(item => item.trim() !== '');
-                elements.forEach(item => {
+            if (!items) return;
+
+            const addedItems = document.getElementById(listId);
+            const elements = items.split(/[\s\t]+/).filter(item => item.trim() !== '');
+
+            elements.forEach(item => {
+                // Проверяем, существует ли уже такой элемент
+                const existingItems = Array.from(addedItems.children).map(child => child.querySelector('span').textContent);
+                if (!existingItems.includes(item)) {
                     const itemElement = document.createElement('div');
                     itemElement.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
                     itemElement.innerHTML = `
@@ -251,9 +288,12 @@
                         </button>
                     `;
                     addedItems.appendChild(itemElement);
-                });
-                input.value = '';
-            }
+                } else {
+                    alert(`Элемент "${item}" уже добавлен.`);
+                }
+            });
+
+            input.value = '';
         }
 
         // Функция для удаления элемента
