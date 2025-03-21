@@ -33,45 +33,76 @@
         <h1 class="text-5xl font-bold mb-8">Настройка правил</h1>
     </header>
     <main class="flex flex-col items-center mt-16 flex-grow">
-        <div class="bg-white p-10 rounded-lg shadow-lg w-full max-w-md">
-            <h2 class="text-3xl font-bold mb-6 text-gray-800">Правила сетевого трафика</h2>
-            
-            <!-- Шаблоны -->
-            <div class="mb-6">
-                <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
-                <div class="space-y-2">
-                    <div id="template1" class="template p-4 rounded-lg" onclick="activateTemplate('template1')">
-                        Шаблон 1: Блокировка всего трафика
+        <div class="flex gap-8 w-full max-w-4xl">
+            <!-- Блок настройки сетевого трафика -->
+            <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
+                <h2 class="text-3xl font-bold mb-6 text-gray-800">Правила сетевого трафика</h2>
+                
+                <!-- Шаблоны -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Выберите шаблон:</h3>
+                    <div class="space-y-2">
+                        <div id="template1" class="template p-4 rounded-lg" onclick="activateTemplate('template1')">
+                            Шаблон 1: Блокировка всего трафика
+                        </div>
+                        <div id="template2" class="template p-4 rounded-lg" onclick="activateTemplate('template2')">
+                            Шаблон 2: Блокировка всего, кроме выбранных сайтов
+                        </div>
+                        <div id="template3" class="template p-4 rounded-lg" onclick="activateTemplate('template3')">
+                            Шаблон 3: Разрешить весь трафик
+                        </div>
                     </div>
-                    <div id="template2" class="template p-4 rounded-lg" onclick="activateTemplate('template2')">
-                        Шаблон 2: Блокировка всего, кроме выбранных сайтов
+                </div>
+
+                <!-- Настройки сетевого трафика -->
+                <div id="exceptionSection" class="mb-4 hidden">
+                    <label for="exceptionSite" class="block mb-2 text-gray-800">Исключение (блокировать всё, кроме):</label>
+                    <div class="flex items-center gap-2">
+                        <input 
+                            type="text" 
+                            id="exceptionSite" 
+                            placeholder="Введите URL сайта (через пробел или табуляцию)" 
+                            class="border rounded p-3 w-full text-gray-800" 
+                            onkeydown="handleKeyDown(event, 'exceptionSite', 'addedSites')" 
+                        />
+                        <button onclick="addSite('exceptionSite', 'addedSites')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
+                            <i class="fas fa-plus"></i>
+                        </button>
                     </div>
-                    <div id="template3" class="template p-4 rounded-lg" onclick="activateTemplate('template3')">
-                        Шаблон 3: Разрешить весь трафик
-                    </div>
+                    <!-- Список добавленных сайтов -->
+                    <div id="addedSites" class="mt-4 space-y-2"></div>
                 </div>
             </div>
 
-            <!-- Настройки -->
-            <div id="exceptionSection" class="mb-4 hidden">
-                <label for="exceptionSite" class="block mb-2 text-gray-800">Исключение (блокировать всё, кроме):</label>
-                <div class="flex items-center gap-2">
-                    <input 
-                        type="text" 
-                        id="exceptionSite" 
-                        placeholder="Введите URL сайта (через пробел или табуляцию)" 
-                        class="border rounded p-3 w-full text-gray-800" 
-                        onkeydown="handleKeyDown(event)" 
-                    />
-                    <button onclick="addSite()" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
-                        <i class="fas fa-plus"></i>
-                    </button>
+            <!-- Блок настройки прав на чтение файлов -->
+            <div class="bg-white p-10 rounded-lg shadow-lg w-1/2">
+                <h2 class="text-3xl font-bold mb-6 text-gray-800">Права на чтение файлов</h2>
+
+                <!-- Настройки прав на чтение -->
+                <div id="readAccessSection">
+                    <label for="readAccess" class="block mb-2 text-gray-800">Разрешить чтение для:</label>
+                    <div class="flex items-center gap-2">
+                        <input 
+                            type="text" 
+                            id="readAccess" 
+                            placeholder="Введите путь к файлу или папке (через пробел или табуляцию)" 
+                            class="border rounded p-3 w-full text-gray-800" 
+                            onkeydown="handleKeyDown(event, 'readAccess', 'addedReadAccess')" 
+                        />
+                        <button onclick="addSite('readAccess', 'addedReadAccess')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <!-- Список добавленных путей -->
+                    <div id="addedReadAccess" class="mt-4 space-y-2"></div>
                 </div>
-                <!-- Список добавленных сайтов -->
-                <div id="addedSites" class="mt-4 space-y-2"></div>
             </div>
-            <button class="bg-purple-600 text-white py-3 px-6 rounded-full hover:bg-purple-700 transition">Сохранить настройки</button>
         </div>
+
+        <!-- Кнопка сохранения -->
+        <button class="bg-purple-600 text-white py-3 px-6 rounded-full hover:bg-purple-700 transition mt-8">
+            Сохранить настройки
+        </button>
     </main>
     <footer class="bg-white text-black py-4 mt-16 w-full text-center">
         <p>© 2023 Настройка правил</p>
@@ -109,28 +140,28 @@
             }
         }
 
-        // Функция для добавления сайта
-        function addSite() {
-            const input = document.getElementById('exceptionSite');
-            const sites = input.value.trim();
+        // Функция для добавления элементов
+        function addSite(inputId, listId) {
+            const input = document.getElementById(inputId);
+            const items = input.value.trim();
 
-            if (sites) {
-                const addedSites = document.getElementById('addedSites');
+            if (items) {
+                const addedItems = document.getElementById(listId);
 
-                // Разделяем введённые домены по пробелам или табуляции
-                const domains = sites.split(/[\s\t]+/).filter(domain => domain.trim() !== '');
+                // Разделяем введённые элементы по пробелам или табуляции
+                const elements = items.split(/[\s\t]+/).filter(item => item.trim() !== '');
 
-                // Добавляем каждый домен в список
-                domains.forEach(domain => {
-                    const siteElement = document.createElement('div');
-                    siteElement.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
-                    siteElement.innerHTML = `
-                        <span>${domain}</span>
+                // Добавляем каждый элемент в список
+                elements.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
+                    itemElement.innerHTML = `
+                        <span>${item}</span>
                         <button onclick="removeSite(this)" class="text-red-500 hover:text-red-700">
                             <i class="fas fa-times"></i>
                         </button>
                     `;
-                    addedSites.appendChild(siteElement);
+                    addedItems.appendChild(itemElement);
                 });
 
                 // Очищаем поле ввода
@@ -138,16 +169,16 @@
             }
         }
 
-        // Функция для удаления сайта
+        // Функция для удаления элемента
         function removeSite(button) {
-            const siteElement = button.closest('div');
-            siteElement.remove();
+            const itemElement = button.closest('div');
+            itemElement.remove();
         }
 
         // Обработчик нажатия клавиши Enter
-        function handleKeyDown(event) {
+        function handleKeyDown(event, inputId, listId) {
             if (event.key === 'Enter') {
-                addSite(); // Добавляем сайт при нажатии Enter
+                addSite(inputId, listId); // Добавляем элементы при нажатии Enter
             }
         }
     </script>
