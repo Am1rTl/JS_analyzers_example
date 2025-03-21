@@ -53,13 +53,22 @@
             </div>
 
             <!-- Настройки -->
-            <div class="flex items-center mb-4">
-                <label for="blockTraffic" class="mr-2 text-lg text-gray-800">Заблокировать весь сетевой трафик:</label>
-                <input type="checkbox" id="blockTraffic" class="toggle-checkbox" />
-            </div>
             <div id="exceptionSection" class="mb-4 hidden">
                 <label for="exceptionSite" class="block mb-2 text-gray-800">Исключение (блокировать всё, кроме):</label>
-                <input type="text" id="exceptionSite" placeholder="Введите URL сайта" class="border rounded p-3 w-full" />
+                <div class="flex items-center gap-2">
+                    <input 
+                        type="text" 
+                        id="exceptionSite" 
+                        placeholder="Введите URL сайта (через пробел или табуляцию)" 
+                        class="border rounded p-3 w-full text-gray-800" 
+                        onkeydown="handleKeyDown(event)" 
+                    />
+                    <button onclick="addSite()" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <!-- Список добавленных сайтов -->
+                <div id="addedSites" class="mt-4 space-y-2"></div>
             </div>
             <button class="bg-purple-600 text-white py-3 px-6 rounded-full hover:bg-purple-700 transition">Сохранить настройки</button>
         </div>
@@ -82,22 +91,63 @@
 
             // Управляем видимостью поля для ввода URL
             const exceptionSection = document.getElementById('exceptionSection');
-            if (templateId === 'template2') {
-                exceptionSection.classList.remove('hidden');
-            } else {
-                exceptionSection.classList.add('hidden');
-            }
 
-            // Применяем настройки в зависимости от выбранного шаблона
             if (templateId === 'template1') {
-                document.getElementById('blockTraffic').checked = true;
+                // Шаблон 1: Блокировка всего трафика
+                exceptionSection.classList.add('hidden');
                 document.getElementById('exceptionSite').value = '';
+                document.getElementById('addedSites').innerHTML = ''; // Очищаем список сайтов
             } else if (templateId === 'template2') {
-                document.getElementById('blockTraffic').checked = true;
+                // Шаблон 2: Блокировка всего, кроме выбранных сайтов
+                exceptionSection.classList.remove('hidden');
                 document.getElementById('exceptionSite').value = '';
             } else if (templateId === 'template3') {
-                document.getElementById('blockTraffic').checked = false;
+                // Шаблон 3: Разрешить весь трафик
+                exceptionSection.classList.add('hidden');
                 document.getElementById('exceptionSite').value = '';
+                document.getElementById('addedSites').innerHTML = ''; // Очищаем список сайтов
+            }
+        }
+
+        // Функция для добавления сайта
+        function addSite() {
+            const input = document.getElementById('exceptionSite');
+            const sites = input.value.trim();
+
+            if (sites) {
+                const addedSites = document.getElementById('addedSites');
+
+                // Разделяем введённые домены по пробелам или табуляции
+                const domains = sites.split(/[\s\t]+/).filter(domain => domain.trim() !== '');
+
+                // Добавляем каждый домен в список
+                domains.forEach(domain => {
+                    const siteElement = document.createElement('div');
+                    siteElement.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
+                    siteElement.innerHTML = `
+                        <span>${domain}</span>
+                        <button onclick="removeSite(this)" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    addedSites.appendChild(siteElement);
+                });
+
+                // Очищаем поле ввода
+                input.value = '';
+            }
+        }
+
+        // Функция для удаления сайта
+        function removeSite(button) {
+            const siteElement = button.closest('div');
+            siteElement.remove();
+        }
+
+        // Обработчик нажатия клавиши Enter
+        function handleKeyDown(event) {
+            if (event.key === 'Enter') {
+                addSite(); // Добавляем сайт при нажатии Enter
             }
         }
     </script>
