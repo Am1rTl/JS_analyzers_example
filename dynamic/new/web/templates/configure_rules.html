@@ -343,6 +343,134 @@
         <p>© 2023 Настройка правил</p>
     </footer>
     <script>
+    window.onload = loadSettings;
+
+    function loadSettings() {
+        fetch('/get_saved_rules', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Restore network action
+            if (data.networkAction === 'allowAll') {
+                selectNetworkAction('allowAll');
+            } else if (data.networkAction === 'blockAll') {
+                selectNetworkAction('blockAll');
+            } else if (data.networkAction === 'custom') {
+                selectNetworkAction('custom');
+            }
+
+            // Restore read action
+            if (data.readAction === 'blockAll') {
+                selectReadAction('blockAll');
+            } else if (data.readAction === 'custom') {
+                selectReadAction('custom');
+            } else if (data.readAction === 'allowAll') {
+                selectReadAction('allowAll');
+            }
+
+            // Restore write action
+            if (data.writeAction === 'blockAll') {
+                selectWriteAction('blockAll');
+            } else if (data.writeAction === 'custom') {
+                selectWriteAction('custom');
+            } else if (data.writeAction === 'allowAll') {
+                selectWriteAction('allowAll');
+            }
+
+            // Restore resource action
+            if (data.resourceAction === 'custom') {
+                selectResourceAction('custom');
+            } else if (data.resourceAction === 'allowAll') {
+                selectResourceAction('allowAll');
+            }
+
+            // Populate added substrings
+            data.substrings.values.forEach(value => {
+                const span = document.createElement('span');
+                span.textContent = value;
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
+                div.innerHTML = `
+                    <span>${value}</span>
+                    <button onclick="removeSite(this)" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                document.getElementById('addedSubstrings').appendChild(div);
+            });
+
+            // Populate added ports
+            data.ports.values.forEach(value => {
+                const span = document.createElement('span');
+                span.textContent = value;
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
+                div.innerHTML = `
+                    <span>${value}</span>
+                    <button onclick="removeSite(this)" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                document.getElementById('addedPorts').appendChild(div);
+            });
+
+            // Populate added IPs
+            data.ips.values.forEach(value => {
+                const span = document.createElement('span');
+                span.textContent = value;
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
+                div.innerHTML = `
+                    <span>${value}</span>
+                    <button onclick="removeSite(this)" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                document.getElementById('addedIps').appendChild(div);
+            });
+
+            // Populate added files
+            data.files.values.forEach(value => {
+                const span = document.createElement('span');
+                span.textContent = value;
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
+                div.innerHTML = `
+                    <span>${value}</span>
+                    <button onclick="removeSite(this)" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                document.getElementById('addedFiles').appendChild(div);
+            });
+
+            // Populate added write files
+            data.writeFiles.values.forEach(value => {
+                const span = document.createElement('span');
+                span.textContent = value;
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
+                div.innerHTML = `
+                    <span>${value}</span>
+                    <button onclick="removeSite(this)" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                document.getElementById('addedWriteFiles').appendChild(div);
+            });
+
+            // Restore memory and CPU limits
+            document.getElementById('memoryInput').value = data.memoryLimits;
+            document.getElementById('cpuInput').value = data.cpuLimits;
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
 
 function resetSettings() {
     // Отправка запроса на сервер для сброса правил

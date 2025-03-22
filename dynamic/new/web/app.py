@@ -107,12 +107,7 @@ def get_chart_data():
 
 @app.route('/set_rule', methods=['GET'])
 def set_rule():
-    with open("rules", "r") as f:
-        data = json.loads(f.read())
-    f.close()
-
-    
-    return render_template("configure_rules.html", data=data)
+    return render_template("configure_rules.html")
 
 
 @app.route("/save_data", methods=['POST'])
@@ -128,6 +123,12 @@ def clear_rules():
     with open("rules", "w") as f:
         f.write("{}")
     return "OK"
+
+@app.route('/get_saved_rules')
+def get_rules():
+    with open("rules", "r") as f:
+        data = f.read()
+    return data
 
 if __name__ == '__main__':
     app.run(debug=True)
