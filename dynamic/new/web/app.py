@@ -109,5 +109,12 @@ def get_chart_data():
 def set_rule():
     return render_template("configure_rules.html")
 
+
+@app.route("/save_data", methods=['POST'])
+def save_data():
+    data = request.json
+    print(data)
+    return "OK"
+
 if __name__ == '__main__':
     app.run(debug=True)

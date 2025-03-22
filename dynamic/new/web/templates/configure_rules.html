@@ -310,7 +310,7 @@
             </div>
         </div>
         <!-- Кнопка сохранения -->
-        <button class="bg-purple-600 text-white py-3 px-6 rounded-full hover:bg-purple-700 transition mt-8">
+        <button class="bg-purple-600 text-white py-3 px-6 rounded-full hover:bg-purple-700 transition mt-8" onclick="saveSettings()">
             Сохранить настройки
         </button>
     </main>
@@ -318,133 +318,219 @@
         <p>© 2023 Настройка правил</p>
     </footer>
     <script>
-        // Функция для выбора действия в сетевых настройках
-        function selectNetworkAction(action) {
-            const networkTemplates = document.querySelectorAll('#allowAllTraffic, #blockAllTraffic, #customRules');
-            networkTemplates.forEach(template => {
-                template.classList.remove('active');
-            });
-            if (action === 'allowAll') {
-                document.getElementById('allowAllTraffic').classList.add('active');
-                document.getElementById('customRulesSection').classList.add('hidden');
-            } else if (action === 'blockAll') {
-                document.getElementById('blockAllTraffic').classList.add('active');
-                document.getElementById('customRulesSection').classList.add('hidden');
-            } else if (action === 'custom') {
-                document.getElementById('customRules').classList.add('active');
-                document.getElementById('customRulesSection').classList.remove('hidden');
-            }
+// Функция для выбора действия в сетевых настройках
+function selectNetworkAction(action) {
+    const networkTemplates = document.querySelectorAll('#allowAllTraffic, #blockAllTraffic, #customRules');
+    networkTemplates.forEach(template => {
+        template.classList.remove('active');
+    });
+    if (action === 'allowAll') {
+        document.getElementById('allowAllTraffic').classList.add('active');
+        document.getElementById('customRulesSection').classList.add('hidden');
+    } else if (action === 'blockAll') {
+        document.getElementById('blockAllTraffic').classList.add('active');
+        document.getElementById('customRulesSection').classList.add('hidden');
+    } else if (action === 'custom') {
+        document.getElementById('customRules').classList.add('active');
+        document.getElementById('customRulesSection').classList.remove('hidden');
+    }
+}
+
+// Функция для выбора действия в правах на чтение файлов
+function selectReadAction(action) {
+    const readTemplates = document.querySelectorAll('#readTemplate1, #readTemplate2, #readTemplate3');
+    readTemplates.forEach(template => {
+        template.classList.remove('active');
+    });
+    if (action === 'blockAll') {
+        document.getElementById('readTemplate1').classList.add('active');
+        document.getElementById('readCustomRulesSection').classList.add('hidden');
+    } else if (action === 'allowAll') {
+        document.getElementById('readTemplate3').classList.add('active');
+        document.getElementById('readCustomRulesSection').classList.add('hidden');
+    } else if (action === 'custom') {
+        document.getElementById('readTemplate2').classList.add('active');
+        document.getElementById('readCustomRulesSection').classList.remove('hidden');
+    }
+}
+
+// Функция для выбора действия в правах на запись файлов
+function selectWriteAction(action) {
+    const writeTemplates = document.querySelectorAll('#writeTemplate1, #writeTemplate2, #writeTemplate3');
+    writeTemplates.forEach(template => {
+        template.classList.remove('active');
+    });
+    if (action === 'blockAll') {
+        document.getElementById('writeTemplate1').classList.add('active');
+        document.getElementById('writeCustomRulesSection').classList.add('hidden');
+    } else if (action === 'allowAll') {
+        document.getElementById('writeTemplate3').classList.add('active');
+        document.getElementById('writeCustomRulesSection').classList.add('hidden');
+    } else if (action === 'custom') {
+        document.getElementById('writeTemplate2').classList.add('active');
+        document.getElementById('writeCustomRulesSection').classList.remove('hidden');
+    }
+}
+
+// Функция для выбора действия в правах на использование ресурсов
+function selectResourceAction(action) {
+    const resourceTemplates = document.querySelectorAll('#resourceTemplate2, #resourceTemplate3');
+    resourceTemplates.forEach(template => {
+        template.classList.remove('active');
+    });
+    if (action === 'custom') {
+        document.getElementById('resourceTemplate2').classList.add('active');
+        document.getElementById('resourceCustomRulesSection').classList.remove('hidden');
+    } else if (action === 'allowAll') {
+        document.getElementById('resourceTemplate3').classList.add('active');
+        document.getElementById('resourceCustomRulesSection').classList.add('hidden');
+    }
+}
+
+// Функция для переключения состояния кнопок
+function toggleAction(activeButtonId, inactiveButtonId, action) {
+    const activeButton = document.getElementById(activeButtonId);
+    const inactiveButton = document.getElementById(inactiveButtonId);
+
+    activeButton.classList.add(action === 'block' ? 'active' : 'allow-active');
+    activeButton.classList.remove('inactive');
+
+    inactiveButton.classList.add('inactive');
+    inactiveButton.classList.remove('active', 'allow-active');
+}
+
+// Функция для добавления элементов
+function addSite(inputId, listId) {
+    const input = document.getElementById(inputId);
+    const items = input.value.trim();
+    if (!items) return;
+
+    const addedItems = document.getElementById(listId);
+    const elements = items.split(/[\s\t]+/).filter(item => item.trim() !== '');
+
+    elements.forEach(item => {
+        // Проверяем, существует ли уже такой элемент
+        const existingItems = Array.from(addedItems.children).map(child => child.querySelector('span').textContent);
+        if (!existingItems.includes(item)) {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
+            itemElement.innerHTML = `
+                <span>${item}</span>
+                <button onclick="removeSite(this)" class="text-red-500 hover:text-red-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            addedItems.appendChild(itemElement);
+        } else {
+            alert(`Элемент "${item}" уже добавлен.`);
         }
+    });
 
-        // Функция для выбора действия в правах на чтение файлов
-        function selectReadAction(action) {
-            const readTemplates = document.querySelectorAll('#readTemplate1, #readTemplate2, #readTemplate3');
-            readTemplates.forEach(template => {
-                template.classList.remove('active');
-            });
-            if (action === 'blockAll') {
-                document.getElementById('readTemplate1').classList.add('active');
-                document.getElementById('readCustomRulesSection').classList.add('hidden');
-            } else if (action === 'allowAll') {
-                document.getElementById('readTemplate3').classList.add('active');
-                document.getElementById('readCustomRulesSection').classList.add('hidden');
-            } else if (action === 'custom') {
-                document.getElementById('readTemplate2').classList.add('active');
-                document.getElementById('readCustomRulesSection').classList.remove('hidden');
-            }
-        }
+    input.value = '';
+}
 
-        // Функция для выбора действия в правах на запись файлов
-        function selectWriteAction(action) {
-            const writeTemplates = document.querySelectorAll('#writeTemplate1, #writeTemplate2, #writeTemplate3');
-            writeTemplates.forEach(template => {
-                template.classList.remove('active');
-            });
-            if (action === 'blockAll') {
-                document.getElementById('writeTemplate1').classList.add('active');
-                document.getElementById('writeCustomRulesSection').classList.add('hidden');
-            } else if (action === 'allowAll') {
-                document.getElementById('writeTemplate3').classList.add('active');
-                document.getElementById('writeCustomRulesSection').classList.add('hidden');
-            } else if (action === 'custom') {
-                document.getElementById('writeTemplate2').classList.add('active');
-                document.getElementById('writeCustomRulesSection').classList.remove('hidden');
-            }
-        }
+// Функция для удаления элемента
+function removeSite(button) {
+    const itemElement = button.closest('div');
+    itemElement.remove();
+}
 
-        // Функция для выбора действия в правах на использование ресурсов
-        function selectResourceAction(action) {
-            const resourceTemplates = document.querySelectorAll('#resourceTemplate1, #resourceTemplate2, #resourceTemplate3');
-            resourceTemplates.forEach(template => {
-                template.classList.remove('active');
-            });
-            if (action === 'blockAll') {
-                document.getElementById('resourceTemplate1').classList.add('active');
-                document.getElementById('resourceCustomRulesSection').classList.add('hidden');
-            } else if (action === 'allowAll') {
-                document.getElementById('resourceTemplate3').classList.add('active');
-                document.getElementById('resourceCustomRulesSection').classList.add('hidden');
-            } else if (action === 'custom') {
-                document.getElementById('resourceTemplate2').classList.add('active');
-                document.getElementById('resourceCustomRulesSection').classList.remove('hidden');
-            }
-        }
+// Обработчик нажатия клавиши Enter
+function handleKeyDown(event, inputId, listId) {
+    if (event.key === 'Enter') {
+        addSite(inputId, listId);
+    }
+}
 
-        // Функция для переключения состояния кнопок
-        function toggleAction(activeButtonId, inactiveButtonId, action) {
-            const activeButton = document.getElementById(activeButtonId);
-            const inactiveButton = document.getElementById(inactiveButtonId);
+// Функция для сохранения настроек
+function saveSettings() {
+    const data = {
+        networkAction: getActiveNetworkAction(),
+        readAction: getActiveReadAction(),
+        writeAction: getActiveWriteAction(),
+        resourceAction: getActiveResourceAction(),
+        substrings: {
+            values: Array.from(document.querySelectorAll('#addedSubstrings div span')).map(span => span.textContent),
+            activeAction: document.querySelector('#allowSubstringButton.allow-active') ? 'Разрешить всё с' : 'Блокировать всё с'
+        },
+        ports: {
+            values: Array.from(document.querySelectorAll('#addedPorts div span')).map(span => span.textContent),
+            activeAction: document.querySelector('#allowPortButton.allow-active') ? 'Разрешить всё с' : 'Блокировать всё с'
+        },
+        ips: {
+            values: Array.from(document.querySelectorAll('#addedIps div span')).map(span => span.textContent),
+            activeAction: document.querySelector('#allowIpButton.allow-active') ? 'Разрешить всё с' : 'Блокировать всё с'
+        },
+        files: {
+            values: Array.from(document.querySelectorAll('#addedFiles div span')).map(span => span.textContent),
+            activeAction: document.querySelector('#allowFileButton.allow-active') ? 'Разрешить всё с' : 'Блокировать всё с'
+        },
+        writeFiles: {
+            values: Array.from(document.querySelectorAll('#addedWriteFiles div span')).map(span => span.textContent),
+            activeAction: document.querySelector('#allowWriteFileButton.allow-active') ? 'Разрешить всё с' : 'Блокировать всё с'
+        },
+        memoryLimits: document.getElementById('memoryInput').value,
+        cpuLimits: document.getElementById('cpuInput').value
+    };
 
-            activeButton.classList.add(action === 'block' ? 'active' : 'allow-active');
-            activeButton.classList.remove('inactive');
+    fetch('/save_data', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
 
-            inactiveButton.classList.add('inactive');
-            inactiveButton.classList.remove('active', 'allow-active');
+// Вспомогательные функции для получения активных действий
+function getActiveNetworkAction() {
+    if (document.getElementById('allowAllTraffic').classList.contains('active')) {
+        return 'allowAll';
+    } else if (document.getElementById('blockAllTraffic').classList.contains('active')) {
+        return 'blockAll';
+    } else if (document.getElementById('customRules').classList.contains('active')) {
+        return 'custom';
+    }
+    return null;
+}
 
-        }
+function getActiveReadAction() {
+    if (document.getElementById('readTemplate1').classList.contains('active')) {
+        return 'blockAll';
+    } else if (document.getElementById('readTemplate2').classList.contains('active')) {
+        return 'custom';
+    } else if (document.getElementById('readTemplate3').classList.contains('active')) {
+        return 'allowAll';
+    }
+    return null;
+}
 
-        // Функция для добавления элементов
-        function addSite(inputId, listId) {
-            const input = document.getElementById(inputId);
-            const items = input.value.trim();
-            if (!items) return;
+function getActiveWriteAction() {
+    if (document.getElementById('writeTemplate1').classList.contains('active')) {
+        return 'blockAll';
+    } else if (document.getElementById('writeTemplate2').classList.contains('active')) {
+        return 'custom';
+    } else if (document.getElementById('writeTemplate3').classList.contains('active')) {
+        return 'allowAll';
+    }
+    return null;
+}
 
-            const addedItems = document.getElementById(listId);
-            const elements = items.split(/[\s\t]+/).filter(item => item.trim() !== '');
-
-            elements.forEach(item => {
-                // Проверяем, существует ли уже такой элемент
-                const existingItems = Array.from(addedItems.children).map(child => child.querySelector('span').textContent);
-                if (!existingItems.includes(item)) {
-                    const itemElement = document.createElement('div');
-                    itemElement.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
-                    itemElement.innerHTML = `
-                        <span>${item}</span>
-                        <button onclick="removeSite(this)" class="text-red-500 hover:text-red-700">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    `;
-                    addedItems.appendChild(itemElement);
-                } else {
-                    alert(`Элемент "${item}" уже добавлен.`);
-                }
-            });
-
-            input.value = '';
-        }
-
-        // Функция для удаления элемента
-        function removeSite(button) {
-            const itemElement = button.closest('div');
-            itemElement.remove();
-        }
-
-        // Обработчик нажатия клавиши Enter
-        function handleKeyDown(event, inputId, listId) {
-            if (event.key === 'Enter') {
-                addSite(inputId, listId);
-            }
-        }
+function getActiveResourceAction() {
+    if (document.getElementById('resourceTemplate2').classList.contains('active')) {
+        return 'custom';
+    } else if (document.getElementById('resourceTemplate3').classList.contains('active')) {
+        return 'allowAll';
+    }
+    return null;
+}
     </script>
 </body>
 </html>
