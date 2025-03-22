@@ -49,23 +49,129 @@
             color: #6B7280;
         }
 
-
-        .header-button {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        .header-button.back {
-            background: linear-gradient(135deg, #6B7280, #374151);
-            color: white;
-        }
+        /* add back button */
         .header-button.reset {
-            background: linear-gradient(135deg, #FF4D4D, #FF7878);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
             color: white;
+            background: linear-gradient(135deg, #FF4D4D, #FF7878); /* Красный градиент */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Тень */
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
         }
-        .header-button:hover {
-            transform: scale(1.05);
+
+        .header-button.reset:hover {
+            background: linear-gradient(135deg, #E53E3E, #F56565); /* Темный красный градиент при наведении */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Увеличенная тень при наведении */
+            transform: translateY(-2px); /* Легкий подъем при наведении */
+        }
+
+        .header-button.reset:active {
+            transform: translateY(0); /* Возврат в исходное положение при нажатии */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Тень возвращается к исходной */
+        }
+
+        .header-button.reset i {
+            margin-right: 0.5rem; /* Отступ между иконкой и текстом (если добавите иконку) */
+            font-size: 1rem; /* Размер иконки */
+        }
+
+        .header-button.back {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(135deg, #FF9A9E, #FAD0C4); /* Яркий градиент (розовый к персиковому) */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Более выраженная тень */
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .header-button.back:hover {
+            background: linear-gradient(135deg, #FAD0C4, #FF9A9E); /* Инвертированный градиент при наведении */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Увеличенная тень при наведении */
+            transform: translateY(-2px); /* Легкий подъем при наведении */
+        }
+
+        .header-button.back:active {
+            transform: translateY(0); /* Возврат в исходное положение при нажатии */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Тень возвращается к исходной */
+        }
+
+        .header-button.back i {
+            margin-right: 0.5rem; /* Отступ между иконкой и текстом */
+            font-size: 1rem; /* Размер иконки */
+        }
+        .save-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem 2.5rem; /* Увеличенный размер */
+            border-radius: 0.75rem; /* Более скруглённые углы */
+            font-weight: 700; /* Жирный шрифт */
+            font-size: 1.25rem; /* Увеличенный размер текста */
+            color: white;
+            background: linear-gradient(135deg, #6EE7B7, #3B82F6); /* Яркий градиент (зелёный к синему) */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Более выраженная тень */
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem; /* Отступ сверху */
+            position: relative; /* Для анимации */
+            overflow: hidden; /* Для анимации */
+        }
+
+        .save-button:hover {
+            background: linear-gradient(135deg, #3B82F6, #6EE7B7); /* Инвертированный градиент при наведении */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Увеличенная тень при наведении */
+            transform: translateY(-3px); /* Более выраженный подъём */
+        }
+
+        .save-button:active {
+            transform: translateY(0); /* Возврат в исходное положение при нажатии */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Тень возвращается к исходной */
+        }
+
+        .save-button:focus {
+            outline: none; /* Убираем стандартный outline */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* Кастомный фокус */
+        }
+
+        /* Анимация "пульсации" */
+        .save-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 70%);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .save-button:hover::after {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        /* Стили для иконки */
+        .save-button i {
+            margin-right: 0.75rem; /* Увеличенный отступ между иконкой и текстом */
+            font-size: 1.25rem; /* Увеличенный размер иконки */
         }
     </style>
 </head>
@@ -335,8 +441,8 @@
             </div>
         </div>
         <!-- Кнопка сохранения -->
-        <button class="bg-purple-600 text-white py-3 px-6 rounded-full hover:bg-purple-700 transition mt-8" onclick="saveSettings()">
-            Сохранить настройки
+        <button class="save-button" onclick="saveSettings()">
+            <i class="fas fa-save"></i> Сохранить настройки
         </button>
     </main>
     <footer class="bg-white text-black py-4 mt-16 w-full text-center">
