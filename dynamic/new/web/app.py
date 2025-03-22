@@ -1,7 +1,7 @@
 from functools import lru_cache
 import subprocess
 import requests as r
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, json, render_template, jsonify, request
 from format_logs import get_logs
 from strace import update_files_actions
 
@@ -107,17 +107,26 @@ def get_chart_data():
 
 @app.route('/set_rule', methods=['GET'])
 def set_rule():
-    return render_template("configure_rules.html")
+    with open("rules", "r") as f:
+        data = json.loads(f.read())
+    f.close()
+
+    
+    return render_template("configure_rules.html", data=data)
 
 
 @app.route("/save_data", methods=['POST'])
 def save_data():
     data = request.json
+    with open("rules", "w") as f:
+        f.write(json.dumps(data))
     print(data)
     return "OK"
 
 @app.route('/clear_rules')
 def clear_rules():
+    with open("rules", "w") as f:
+        f.write("{}")
     return "OK"
 
 if __name__ == '__main__':
