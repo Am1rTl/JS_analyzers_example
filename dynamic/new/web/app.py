@@ -116,5 +116,9 @@ def save_data():
     print(data)
     return "OK"
 
+@app.route('/clear_rules')
+def clear_rules():
+    return "OK"
+
 if __name__ == '__main__':
     app.run(debug=True)
