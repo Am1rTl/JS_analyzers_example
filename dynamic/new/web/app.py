@@ -1,6 +1,7 @@
 from functools import lru_cache
 import subprocess
 import requests as r
+import re
 from flask import Flask, json, render_template, jsonify, request
 from format_logs import get_logs
 from strace import update_files_actions
@@ -30,8 +31,51 @@ def get_ext_info(ext):
     except:
         img = "Not found"
 
-    return name, author, img
+    # Получаем версию
+    try:
+        version = data.split('Version</td>')[1].split('">')[1].split('</td>')[0]
+    except:
+        version = "N/A"
 
+    # Получаем рейтинг
+    try:
+        rating = data.split('average-rating">')[1].split('</span>')[0].strip()
+        rating_count = data.split('rating-count">')[1].split('</span>')[0].strip()
+    except:
+        rating = "N/A"
+        rating_count = "0"
+
+    # Получаем количество установок
+    try:
+        installs = data.split('installs">')[1].split('</span>')[0].strip()
+    except:
+        installs = "N/A"
+
+    # Получаем количество загрузок
+    try:
+        downloads = data.split('downloads">')[1].split('</span>')[0].strip()
+    except:
+        downloads = "N/A"
+
+    return name, author, img, version, rating, rating_count, installs, downloads
+
+@lru_cache(maxsize=None)
+def get_ext_description(ext):
+    resp = r.get(f"https://marketplace.visualstudio.com/items?itemName={ext}")
+    data = resp.text
+    pattern = r'<img src="https:\/\/[^"]+" alt="logo" width="200">'
+    try:
+        # Получаем полное описание из overview
+        overview = data.split('class="overview selected-tab"')[1].split('<div class="itemDetails">')[1].split('<div class="markdown">')[1]
+        overview = overview.split('</div>')[0]
+        
+        # Удаляем изображение иконки из описания
+        if 'logo.png' in overview:
+            overview = re.sub(pattern, '', overview)
+        
+        return "", overview
+    except:
+        return "Description not found", ""
 
 @app.route('/get_ext_list', methods=['POST'])
 def ext_list():
@@ -68,10 +112,36 @@ def search_extension():
 def about():
     return render_template('about_one.html')
 
+@app.route('/install_extension/<ext_id>')
+def install_extension(ext_id):
+    try:
+        result = subprocess.run(['code', '--install-extension', ext_id], 
+                              stdout=subprocess.PIPE, 
+                              stderr=subprocess.PIPE, 
+                              text=True)
+        if result.returncode == 0:
+            return jsonify({"success": True, "message": "Extension installed successfully"})
+        else:
+            return jsonify({"success": False, "message": f"Installation failed: {result.stderr}"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)})
+
 @app.route('/about/<ext>')
 def about_ext(ext):
-    name, author, img = get_ext_info(ext)
-    return render_template('about_one.html', id=ext, name=name, author=author, img=img)
+    name, author, img, version, rating, rating_count, installs, downloads = get_ext_info(ext)
+    short_description, overview = get_ext_description(ext)
+    return render_template('about_one.html', 
+                         id=ext, 
+                         name=name, 
+                         author=author, 
+                         img=img, 
+                         description=short_description,
+                         overview=overview,
+                         version=version,
+                         rating=rating,
+                         rating_count=rating_count,
+                         installs=installs,
+                         downloads=downloads)
 
 @app.route('/rules')
 def rules():
