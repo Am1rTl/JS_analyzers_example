@@ -5,6 +5,7 @@ import re
 from flask import Flask, json, render_template, jsonify, request
 from format_logs import get_logs
 from strace import update_files_actions
+from rule_manager import RuleManager
 
 app = Flask(__name__)
 
@@ -185,7 +186,11 @@ def save_data():
     data = request.json
     with open("rules", "w") as f:
         f.write(json.dumps(data))
-    print(data)
+    
+    # Применить правила
+    rule_manager = RuleManager()
+    rule_manager.apply_rules()
+    
     return "OK"
 
 @app.route('/clear_rules')

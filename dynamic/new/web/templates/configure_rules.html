@@ -173,6 +173,122 @@
             margin-right: 0.75rem; /* Увеличенный отступ между иконкой и текстом */
             font-size: 1.25rem; /* Увеличенный размер иконки */
         }
+
+        /* Стили для сообщения об ошибке */
+        .error-message {
+            display: none;
+            color: #dc2626;
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .error-message.warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-message i {
+            margin-right: 0.5rem;
+        }
+
+        /* Стили для валидации input */
+        input.valid {
+            border-color: #10b981;
+        }
+
+        input.invalid {
+            border-color: #dc2626;
+        }
+
+        /* Стили для кнопки добавления */
+        .add-button {
+            transition: all 0.2s ease;
+        }
+
+        .add-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .extension-description-container {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+
+        .extension-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: white;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+        }
+
+        .extension-icon {
+            width: 48px;
+            height: 48px;
+            margin-right: 16px;
+            border-radius: 4px;
+        }
+
+        .extension-info {
+            flex: 1;
+        }
+
+        .extension-title {
+            margin: 0 0 8px 0;
+            color: #24292e;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .extension-meta {
+            color: #586069;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .extension-meta div {
+            margin-bottom: 4px;
+        }
+
+        .extension-meta strong {
+            color: #24292e;
+            font-weight: 600;
+        }
+
+        .extension-content {
+            padding: 16px;
+            background: white;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-b from-purple-500 to-blue-500 text-white min-h-screen flex flex-col">
@@ -235,30 +351,32 @@
                         <div id="addedSubstrings" class="mt-4 space-y-2"></div>
                     </div>
                     <!-- Фильтрация по порту -->
-                    <div class="mb-4">
-                        <div class="flex justify-between mb-4">
-                            <button id="blockPortButton" class="action-button active" onclick="toggleAction('blockPortButton', 'allowPortButton', 'block')">
-                                Блокировать всё с
-                            </button>
-                            <button id="allowPortButton" class="action-button inactive" onclick="toggleAction('allowPortButton', 'blockPortButton', 'allow')">
-                                Разрешить всё с
-                            </button>
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">Правила по порту:</h3>
+                        <div class="flex flex-col space-y-2">
+                            <div class="flex space-x-2">
+                                <div class="flex-grow">
+                                    <input type="number" id="portInput" 
+                                           class="w-full p-3 border rounded-lg transition-colors duration-200"
+                                           placeholder="Введите номер порта (1-65535)"
+                                           min="1" max="65535"
+                                           onkeydown="handleKeyDown(event, 'portInput', 'portList')"
+                                           oninput="validatePort(this)">
+                                    <div id="portError" class="error-message">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span class="error-text">Порт должен быть числом от 1 до 65535</span>
+                                    </div>
+                                </div>
+                                <button id="addPortButton" 
+                                        class="add-button action-button" 
+                                        onclick="addRule('port')" 
+                                        disabled>
+                                    <i class="fas fa-plus mr-2"></i>
+                                    Добавить
+                                </button>
+                            </div>
                         </div>
-                        <label for="portInput" class="block mb-2 text-gray-800">Порт:</label>
-                        <div class="flex items-center gap-2">
-                            <input 
-                                type="number" 
-                                id="portInput" 
-                                placeholder="Введите номер порта" 
-                                class="border rounded p-3 w-full text-gray-800" 
-                                onkeydown="handleKeyDown(event, 'portInput', 'addedPorts')" 
-                            />
-                            <button onclick="addSite('portInput', 'addedPorts')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        <!-- Список добавленных портов -->
-                        <div id="addedPorts" class="mt-4 space-y-2"></div>
+                        <ul id="portList" class="space-y-2 mt-4"></ul>
                     </div>
                     <!-- Фильтрация по IP -->
                     <div class="mb-4">
@@ -444,9 +562,19 @@
         <button class="save-button" onclick="saveSettings()">
             <i class="fas fa-save"></i> Сохранить настройки
         </button>
+        <div class="extension-description-container" style="display: none;">
+            <div class="extension-header">
+                <img class="extension-icon" src="" alt="Extension icon">
+                <div class="extension-info">
+                    <h2 class="extension-title"></h2>
+                    <div class="extension-meta"></div>
+                </div>
+            </div>
+            <div class="extension-content"></div>
+        </div>
     </main>
     <footer class="bg-white text-black py-4 mt-16 w-full text-center">
-        <p>© 2023 Настройка правил</p>
+        <p> 2023 Настройка правил</p>
     </footer>
     <script>
     window.onload = loadSettings;
@@ -560,7 +688,7 @@ function loadSettings() {
                     <i class="fas fa-times"></i>
                 </button>
             `;
-            document.getElementById('addedPorts').appendChild(div);
+            document.getElementById('portList').appendChild(div);
         });
 
         // Populate added IPs
@@ -716,26 +844,30 @@ function addSite(inputId, listId) {
     const items = input.value.trim();
     if (!items) return;
 
-    const addedItems = document.getElementById(listId);
-    const elements = items.split(/[\s\t]+/).filter(item => item.trim() !== '');
+    const list = document.getElementById(listId);
+        
+    // Проверяем на дубликаты
+    const existingItems = Array.from(list.children).map(child => child.querySelector('span').textContent.replace('Удалить', '').trim());
+    if (existingItems.includes(items)) {
+        alert(`${items} уже добавлен(а)`);
+        return;
+    }
 
-    elements.forEach(item => {
-        // Проверяем, существует ли уже такой элемент
-        const existingItems = Array.from(addedItems.children).map(child => child.querySelector('span').textContent);
-        if (!existingItems.includes(item)) {
-            const itemElement = document.createElement('div');
-            itemElement.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
-            itemElement.innerHTML = `
-                <span>${item}</span>
-                <button onclick="removeSite(this)" class="text-red-500 hover:text-red-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            addedItems.appendChild(itemElement);
-        } else {
-            alert(`Элемент "${item}" уже добавлен.`);
-        }
-    });
+    const li = document.createElement('div');
+    li.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
+        
+    const span = document.createElement('span');
+    span.textContent = items;
+    li.appendChild(span);
+
+    const button = document.createElement('button');
+    button.className = 'text-red-500 hover:text-red-700 ml-4';
+    button.innerHTML = '<i class="fas fa-times"></i>';
+    button.onclick = function() {
+        li.remove();
+    }
+    li.appendChild(button);
+    list.appendChild(li);
 
     input.value = '';
 }
@@ -765,7 +897,7 @@ function saveSettings() {
             activeAction: document.querySelector('#allowSubstringButton.allow-active') ? 'Разрешить всё с' : 'Блокировать всё с'
         },
         ports: {
-            values: Array.from(document.querySelectorAll('#addedPorts div span')).map(span => span.textContent),
+            values: Array.from(document.querySelectorAll('#portList div span')).map(span => span.textContent),
             activeAction: document.querySelector('#allowPortButton.allow-active') ? 'Разрешить всё с' : 'Блокировать всё с'
         },
         ips: {
@@ -843,7 +975,124 @@ function getActiveResourceAction() {
     return null;
 }
 
+function validatePort(input) {
+    const value = parseInt(input.value);
+    const errorDiv = document.getElementById('portError');
+    const addButton = document.querySelector('#addPortButton');
+    
+    // Очищаем предыдущую ошибку
+    errorDiv.classList.remove('show');
+    
+    // Проверяем валидность порта
+    if (isNaN(value) || value < 1 || value > 65535) {
+        errorDiv.classList.add('show');
+        addButton.disabled = true;
+        input.classList.add('border-red-500');
+        return false;
+    }
+    
+    // Если порт валидный
+    addButton.disabled = false;
+    input.classList.remove('border-red-500');
+    return true;
+}
 
+function addRule(type) {
+    let inputId;
+    let listId;
+    
+    if (type === 'substring') {
+        inputId = 'substringInput';
+        listId = 'addedSubstrings';
+    } else if (type === 'port') {
+        inputId = 'portInput';
+        listId = 'portList';
+        // Проверяем валидность порта перед добавлением
+        if (!validatePort(document.getElementById(inputId))) {
+            return;
+        }
+    } else if (type === 'ip') {
+        inputId = 'ipInput';
+        listId = 'addedIps';
+    }
+
+    const input = document.getElementById(inputId);
+    const items = input.value.trim();
+    if (!items) return;
+
+    const list = document.getElementById(listId);
+        
+    // Проверяем на дубликаты
+    const existingItems = Array.from(list.children).map(li => li.querySelector('span').textContent.replace('Удалить', '').trim());
+    if (existingItems.includes(items)) {
+        alert(`${type === 'port' ? 'Порт' : type === 'ip' ? 'IP-адрес' : 'Подстрока'} "${items}" уже добавлен(а)`);
+        return;
+    }
+
+    const li = document.createElement('div');
+    li.className = 'flex items-center justify-between bg-gray-100 p-3 rounded-lg text-gray-800';
+        
+    const span = document.createElement('span');
+    span.textContent = items;
+    li.appendChild(span);
+
+    const button = document.createElement('button');
+    button.className = 'text-red-500 hover:text-red-700 ml-4';
+    button.innerHTML = '<i class="fas fa-times"></i>';
+    button.onclick = function() {
+        li.remove();
+    }
+    li.appendChild(button);
+    list.appendChild(li);
+
+    input.value = '';
+    if (type === 'port') {
+        document.querySelector('#addPortButton').disabled = true;
+    }
+}
+
+function displayExtensionInfo(htmlContent) {
+    // Создаем временный DOM для парсинга HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+            
+    // Получаем метаданные
+    const metadata = {
+        description: doc.querySelector('meta[name="description"]')?.content,
+        keywords: doc.querySelector('meta[name="keywords"]')?.content,
+        title: doc.querySelector('meta[property="og:title"]')?.content,
+        image: doc.querySelector('meta[property="og:image"]')?.content
+    };
+
+    // Находим контейнер
+    const container = document.querySelector('.extension-description-container');
+    if (!container) return;
+
+    // Обновляем содержимое
+    if (metadata.image) {
+        container.querySelector('.extension-icon').src = metadata.image;
+    }
+            
+    if (metadata.title) {
+        container.querySelector('.extension-title').textContent = metadata.title;
+    }
+
+    const metaContent = container.querySelector('.extension-meta');
+    metaContent.innerHTML = `
+        ${metadata.description ? `<div><strong>Description:</strong> ${metadata.description}</div>` : ''}
+        ${metadata.keywords ? `<div><strong>Keywords:</strong> ${metadata.keywords}</div>` : ''}
+    `;
+
+    // Показываем контейнер
+    container.style.display = 'block';
+}
+
+// Функция для безопасной обработки HTML
+function sanitizeHTML(str) {
+    const temp = document.createElement('div');
+    temp.textContent = str;
+    return temp.innerHTML;
+}
     </script>
 </body>
 </html>
