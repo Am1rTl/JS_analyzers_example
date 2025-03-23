@@ -68,7 +68,7 @@ def get_ext_description(ext):
     try:
         # Получаем полное описание из overview
         overview = data.split('class="overview selected-tab"')[1].split('<div class="itemDetails">')[1].split('<div class="markdown">')[1]
-        overview = overview.split('</div>')[0]
+        overview = overview.split('Contact us')[0]
         
         # Удаляем изображение иконки из описания
         if 'logo.png' in overview:
@@ -204,6 +204,24 @@ def get_rules():
     with open("rules", "r") as f:
         data = f.read()
     return data
+
+@app.route('/guide')
+def guide():
+    return render_template('guide.html')
+
+@app.route('/check_extension/<ext_id>')
+def check_extension(ext_id):
+    extensions = get_extensions_list()
+    is_installed = ext_id in extensions
+    return jsonify({'installed': is_installed})
+
+@app.route('/delete_ext/<ext_id>', methods=['DELETE'])
+def delete_extension(ext_id):
+    try:
+        subprocess.run(['code', '--uninstall-extension', ext_id], check=True)
+        return jsonify({'success': True})
+    except subprocess.CalledProcessError:
+        return jsonify({'success': False}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

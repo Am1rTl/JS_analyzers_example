@@ -74,7 +74,7 @@
                                 <span>View on Marketplace</span>
                                 <i class="fas fa-external-link-alt ml-2"></i>
                             </a>
-                            <button onclick="installExtension('{{id}}')"
+                            <button id="extensionButton" onclick="handleExtension('{{id}}')"
                                     class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 inline-flex items-center">
                                 <i class="fas fa-download mr-2"></i>
                                 <span>Install Extension</span>
@@ -104,46 +104,73 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
 
     <script>
-    // Подсвечиваем код после загрузки страницы
-    document.addEventListener('DOMContentLoaded', (event) => {
-        Prism.highlightAll();
-    });
+        async function checkExtension(extId) {
+            try {
+                const response = await fetch(`/check_extension/${extId}`);
+                const data = await response.json();
+                return data.installed;
+            } catch (error) {
+                console.error('Error checking extension:', error);
+                return false;
+            }
+        }
 
-    function installExtension(extId) {
-        const statusDiv = document.getElementById('installation-status');
-        const installButton = document.querySelector('button');
-        
-        // Disable button during installation
-        installButton.disabled = true;
-        installButton.classList.add('opacity-50');
-        
-        // Show loading state
-        statusDiv.textContent = 'Installing...';
-        statusDiv.className = 'mt-2 p-2 rounded bg-blue-100 text-blue-700';
-        statusDiv.classList.remove('hidden');
+        async function updateButtonState(extId) {
+            const button = document.getElementById('extensionButton');
+            const isInstalled = await checkExtension(extId);
+            
+            if (isInstalled) {
+                button.innerHTML = '<i class="fas fa-trash-alt mr-2"></i><span>Uninstall Extension</span>';
+                button.classList.remove('bg-green-500', 'hover:bg-green-600');
+                button.classList.add('bg-red-500', 'hover:bg-red-600');
+            } else {
+                button.innerHTML = '<i class="fas fa-download mr-2"></i><span>Install Extension</span>';
+                button.classList.remove('bg-red-500', 'hover:bg-red-600');
+                button.classList.add('bg-green-500', 'hover:bg-green-600');
+            }
+        }
 
-        fetch(`/install_extension/${extId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    statusDiv.textContent = 'Extension installed successfully!';
-                    statusDiv.className = 'mt-2 p-2 rounded bg-green-100 text-green-700';
-                } else {
-                    statusDiv.textContent = `Installation failed: ${data.message}`;
+        async function handleExtension(extId) {
+            const isInstalled = await checkExtension(extId);
+            const statusDiv = document.getElementById('installation-status');
+            
+            if (isInstalled) {
+                try {
+                    const response = await fetch(`/delete_ext/${extId}`, { method: 'DELETE' });
+                    const data = await response.json();
+                    if (data.success) {
+                        statusDiv.textContent = 'Extension uninstalled successfully!';
+                        statusDiv.className = 'mt-2 p-2 rounded bg-green-100 text-green-700';
+                    } else {
+                        statusDiv.textContent = 'Failed to uninstall extension';
+                        statusDiv.className = 'mt-2 p-2 rounded bg-red-100 text-red-700';
+                    }
+                } catch (error) {
+                    statusDiv.textContent = `Error: ${error.message}`;
                     statusDiv.className = 'mt-2 p-2 rounded bg-red-100 text-red-700';
-                    // Re-enable button on failure
-                    installButton.disabled = false;
-                    installButton.classList.remove('opacity-50');
                 }
-            })
-            .catch(error => {
-                statusDiv.textContent = `Error: ${error.message}`;
-                statusDiv.className = 'mt-2 p-2 rounded bg-red-100 text-red-700';
-                // Re-enable button on error
-                installButton.disabled = false;
-                installButton.classList.remove('opacity-50');
-            });
-    }
+            } else {
+                // Open marketplace link
+                window.location.href = `https://marketplace.visualstudio.com/items?itemName=${extId}`;
+            }
+            statusDiv.classList.remove('hidden');
+            
+            // Update button state after a short delay
+            setTimeout(() => updateButtonState(extId), 1000);
+        }
+
+        // Check extension status when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const extId = '{{id}}';
+            updateButtonState(extId);
+            // Check periodically for changes
+            setInterval(() => updateButtonState(extId), 5000);
+        });
+
+        // Подсвечиваем код после загрузки страницы
+        document.addEventListener('DOMContentLoaded', (event) => {
+            Prism.highlightAll();
+        });
     </script>
 </body>
 </html>
