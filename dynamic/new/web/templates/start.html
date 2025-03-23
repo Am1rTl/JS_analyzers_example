@@ -23,6 +23,21 @@
    .suggestion-item:hover {
      background-color: rgba(147, 51, 234, 0.1);
    }
+   .quick-suggestions {
+     display: flex;
+     gap: 10px;
+     margin-top: 10px;
+   }
+   .quick-suggestion {
+     background-color: rgba(255, 255, 255, 0.1);
+     padding: 8px 12px;
+     border-radius: 20px;
+     cursor: pointer;
+     transition: background-color 0.2s ease;
+   }
+   .quick-suggestion:hover {
+     background-color: rgba(255, 255, 255, 0.2);
+   }
   </style>
  </head>
  <body class="bg-gradient-to-b from-purple-500 to-blue-500 text-white min-h-screen flex flex-col">
@@ -55,6 +70,8 @@
         <i class="fas fa-search"></i>
       </button>
     </div>
+    <!-- Quick Suggestions -->
+    <div id="quickSuggestions" class="quick-suggestions"></div>
     <!-- Suggestions Container -->
     <div id="suggestionsContainer" class="suggestions-container absolute w-full mt-2 bg-white rounded-2xl shadow-xl z-50 max-h-96 overflow-y-auto hidden">
     </div>
@@ -141,226 +158,119 @@
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-   const ctx1 = document.getElementById('chart1').getContext('2d');
-   const chart1 = new Chart(ctx1, {
-       type: 'line',
-       data: {
-           labels: ['0', '1', '2', '3', '4', '5', '6'],
-           datasets: [{
-               label: 'CPU Usage',
-               data: [65, 59, 80, 81, 56, 55, 40],
-               borderColor: 'rgba(75, 192, 192, 1)',
-               borderWidth: 1,
-               fill: false
-           }]
-       },
-       options: {
-           responsive: true,
-           maintainAspectRatio: false,
-           scales: {
-               x: {
-                   display: true,
-                   title: {
-                       display: true,
-                       text: 'Minutes Ago'
-                   },
-                   reverse: true
-               },
-               y: {
-                   display: true,
-                   title: {
-                       display: true,
-                       text: 'Value (%)'
-                   }
-               }
-           }
-       }
-   });
+    // Debounce function to limit API calls
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
 
-   const ctx2 = document.getElementById('chart2').getContext('2d');
-   const chart2 = new Chart(ctx2, {
-       type: 'line',
-       data: {
-           labels: ['0', '1', '2', '3', '4', '5', '6'],
-           datasets: [{
-               label: 'Memory Usage',
-               data: [28, 48, 40, 19, 86, 27, 90],
-               borderColor: 'rgba(153, 102, 255, 1)',
-               borderWidth: 1,
-               fill: false
-           }]
-       },
-       options: {
-           responsive: true,
-           maintainAspectRatio: false,
-           scales: {
-               x: {
-                   display: true,
-                   title: {
-                       display: true,
-                       text: 'Minutes Ago'
-                   },
-                   reverse: true
-               },
-               y: {
-                   display: true,
-                   title: {
-                       display: true,
-                       text: 'Value (%)'
-                   }
-               }
-           }
-       }
-   });
-
-   // Search Functionality
-   const searchInput = document.getElementById('searchInput');
-   const suggestionsContainer = document.getElementById('suggestionsContainer');
-   let currentSuggestions = [];
-   let selectedIndex = -1;
-
-   // Debounce function
-   function debounce(func, wait) {
-     let timeout;
-     return function executedFunction(...args) {
-       const later = () => {
-         clearTimeout(timeout);
-         func(...args);
-       };
-       clearTimeout(timeout);
-       timeout = setTimeout(later, wait);
-     };
-   }
-
-   // Fetch suggestions from the server
-   async function fetchSuggestions(query) {
-     try {
-       const response = await fetch('/get_ext_list', {
+    // Fetch suggestions from server
+    async function fetchSuggestions(query) {
+      if (!query) return [];
+      try {
+        const response = await fetch('/get_ext_list', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ extensionName: query }),
+          body: JSON.stringify({ extensionName: query })
         });
-       if (!response.ok) throw new Error('Network response was not ok');
-       const extensions = await response.json();
-       return extensions.filter(ext => 
-         ext.toLowerCase().includes(query.toLowerCase())
-       ).slice(0, 8); // Limit to 8 suggestions
-     } catch (error) {
-       console.error('Error fetching suggestions:', error);
-       return [];
-     }
-   }
+        const data = await response.json();
+        return data.success ? data.extensions : [];
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+        return [];
+      }
+    }
 
-   // Highlight matching text
-   function highlightMatch(text, query) {
-     if (!query) return text;
-     const regex = new RegExp(`(${query})`, 'gi');
-     return text.replace(regex, '<strong class="text-purple-600">$1</strong>');
-   }
+    // Highlight matching text
+    function highlightMatch(text, query) {
+      if (!text || !query) return text;
+      const regex = new RegExp(`(${query})`, 'gi');
+      return text.replace(regex, '<mark class="bg-yellow-200 text-black">$1</mark>');
+    }
 
-   // Render suggestions
-   function renderSuggestions(suggestions, query) {
-     if (!suggestions.length) {
-       suggestionsContainer.classList.add('hidden');
-       return;
-     }
+    // Render quick suggestions
+    function renderQuickSuggestions(suggestions) {
+      const container = document.getElementById('quickSuggestions');
+      if (!suggestions.length) {
+        container.innerHTML = '';
+        return;
+      }
 
-     suggestionsContainer.innerHTML = suggestions
-       .map((suggestion, index) => `
-         <div class="suggestion-item p-3 cursor-pointer text-gray-700 ${
-           index === selectedIndex ? 'bg-purple-50' : ''
-         }" data-index="${index}">
-           <div class="flex items-center">
-             <i class="fas fa-search text-gray-400 mr-3"></i>
-             <div>${highlightMatch(suggestion, query)}</div>
-           </div>
-         </div>
-       `)
-       .join('');
+      const html = suggestions.slice(0, 5).map(ext => `
+        <div class="quick-suggestion" onclick="window.location.href='${ext.about_url}'">
+          ${ext.title}
+        </div>
+      `).join('');
 
-     suggestionsContainer.classList.remove('hidden');
-     suggestionsContainer.classList.add('show');
-   }
+      container.innerHTML = html;
+    }
 
-   // Handle input changes
-   const handleInput = debounce(async (e) => {
-     const query = e.target.value.trim();
-     if (!query) {
-       suggestionsContainer.classList.add('hidden');
-       return;
-     }
+    // Render suggestions
+    function renderSuggestions(suggestions, query) {
+      const container = document.getElementById('suggestionsContainer');
+      
+      if (!suggestions.length) {
+        container.classList.add('hidden');
+        return;
+      }
 
-     currentSuggestions = await fetchSuggestions(query);
-     renderSuggestions(currentSuggestions, query);
-   }, 300);
+      const html = suggestions.map(ext => `
+        <div class="suggestion-item p-4 hover:bg-purple-50 cursor-pointer flex items-center space-x-4" 
+             onclick="window.location.href='${ext.about_url}'">
+          <img src="${ext.icon || '/static/default-icon.png'}" alt="${ext.title}" class="w-8 h-8 rounded">
+          <div class="flex-grow">
+            <div class="font-medium text-black">${highlightMatch(ext.title, query)}</div>
+            <div class="text-sm text-gray-600">${ext.publisher}</div>
+          </div>
+          <div class="text-sm text-gray-500">
+            ${ext.installs ? `${ext.installs.toLocaleString()} installs` : ''}
+            ${ext.rating ? ` • ${ext.rating.toFixed(1)}★` : ''}
+          </div>
+        </div>
+      `).join('');
 
-   // Event Listeners
-   searchInput.addEventListener('input', handleInput);
+      container.innerHTML = html;
+      container.classList.remove('hidden');
+    }
 
-   // Handle search button click
-   document.getElementById('searchButton').addEventListener('click', async () => {
-     const query = searchInput.value.trim();
-     if (query) {
-       const response = await fetch('/search_extension', {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json',
-         },
-         body: JSON.stringify({ extensionName: query }),
-       });
-       // Handle response if needed
-     }
-   });
+    // Handle input changes
+    const searchInput = document.getElementById('searchInput');
+    const handleInput = debounce(async (e) => {
+      const query = e.target.value.trim();
+      const suggestions = await fetchSuggestions(query);
+      renderQuickSuggestions(suggestions);
+      renderSuggestions(suggestions, query);
+    }, 300);
 
-   // Click handler for suggestions
+    searchInput.addEventListener('input', handleInput);
 
-   suggestionsContainer.addEventListener('click', (e) => {
-     const suggestionItem = e.target.closest('.suggestion-item');
-     if (suggestionItem) {
-       const index = parseInt(suggestionItem.dataset.index);
-       const extensionName = currentSuggestions[index];
-       window.location.href = `/about/${extensionName}`;
-     }
-   });
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+      const container = document.getElementById('suggestionsContainer');
+      const searchBox = document.getElementById('searchInput');
+      if (!container.contains(e.target) && e.target !== searchBox) {
+        container.classList.add('hidden');
+      }
+    });
 
-   // Keyboard navigation
-   searchInput.addEventListener('keydown', (e) => {
-     if (!currentSuggestions.length) return;
-
-     switch(e.key) {
-       case 'ArrowDown':
-         e.preventDefault();
-         selectedIndex = Math.min(selectedIndex + 1, currentSuggestions.length - 1);
-         renderSuggestions(currentSuggestions, searchInput.value);
-         break;
-       case 'ArrowUp':
-         e.preventDefault();
-         selectedIndex = Math.max(selectedIndex - 1, -1);
-         renderSuggestions(currentSuggestions, searchInput.value);
-         break;
-       case 'Enter':
-         if (selectedIndex >= 0) {
-           searchInput.value = currentSuggestions[selectedIndex];
-           suggestionsContainer.classList.add('hidden');
-           selectedIndex = -1;
-         }
-         break;
-       case 'Escape':
-         suggestionsContainer.classList.add('hidden');
-         selectedIndex = -1;
-         break;
-     }
-   });
-
-   // Close suggestions when clicking outside
-   document.addEventListener('click', (e) => {
-     if (!e.target.closest('#searchInput') && !e.target.closest('#suggestionsContainer')) {
-       suggestionsContainer.classList.add('hidden');
-       selectedIndex = -1;
-     }
-   });
+    // Show suggestions when focusing on search box
+    searchInput.addEventListener('focus', async () => {
+      const query = searchInput.value.trim();
+      if (query) {
+        const suggestions = await fetchSuggestions(query);
+        renderQuickSuggestions(suggestions);
+        renderSuggestions(suggestions, query);
+      }
+    });
   </script>
  </body>
 </html>

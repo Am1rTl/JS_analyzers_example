@@ -22,7 +22,7 @@ def get_ext_info(ext):
         name = data.split("ux-item-name")[2].split(">")[1].split("<")[0]
     except:
         name = "Not found"
-    try: 
+    try:
         author = data.split("ux-item-publisher-link item-banner-focussable-child-item")[1].split(">")[1].split("<")[0]
     except:
         author = "Not found"
@@ -78,19 +78,117 @@ def get_ext_description(ext):
     except:
         return "Description not found", ""
 
+def search_marketplace_extensions(query):
+    url = "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery"
+    session_id = '544d7c84-4822-4f8d-b683-86f71afd4dda'
+    
+    headers = {
+        'Accept': 'application/json;api-version=7.2-preview.1;excludeUrls=true',
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36',
+        'Accept-Language': 'en-GB,en;q=0.9',
+        'X-TFS-Session': session_id,
+        'X-TFS-FedAuthRedirect': 'Suppress',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Origin': 'https://marketplace.visualstudio.com',
+        'Referer': f'https://marketplace.visualstudio.com/search?term={query}&target=VSCode&category=All%20categories&sortBy=Relevance',
+        'Sec-Ch-Ua': '"Not A(Brand";v="8", "Chromium";v="132"',
+        'Sec-Ch-Ua-Mobile': '?0',
+        'Sec-Ch-Ua-Platform': '"Linux"',
+        'Sec-Fetch-Site': 'same-origin',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Dest': 'empty',
+        'Priority': 'u=1, i'
+    }
+    
+    data = {
+        "assetTypes": [
+            "Microsoft.VisualStudio.Services.Icons.Default",
+            "Microsoft.VisualStudio.Services.Icons.Branding",
+            "Microsoft.VisualStudio.Services.Icons.Small"
+        ],
+        "filters": [{
+            "criteria": [
+                {"filterType": 8, "value": "Microsoft.VisualStudio.Code"},
+                {"filterType": 10, "value": query},
+                {"filterType": 12, "value": "37888"}
+            ],
+            "direction": 2,
+            "pageSize": 54,
+            "pageNumber": 1,
+            "sortBy": 0,
+            "sortOrder": 0,
+            "pagingToken": None
+        }],
+        "flags": 870
+    }
+    
+    try:
+        response = r.post(url, headers=headers, json=data)
+        print(response.text)
+        
+        if response.status_code == 200:
+            results = response.json().get('results', [])
+            extensions = []
+            
+            if results and len(results) > 0:
+                for ext in results[0].get('extensions', []):
+                    # Get icon URL from assets
+                    icon_url = None
+                    if 'versions' in ext and len(ext['versions']) > 0:
+                        files = ext['versions'][0].get('files', [])
+                        for file in files:
+                            if file.get('assetType') == 'Microsoft.VisualStudio.Services.Icons.Small':
+                                icon_url = file.get('source')
+                                break
+                    
+                    # Get statistics
+                    stats = {stat['statisticName']: stat['value'] for stat in ext.get('statistics', [])}
+                    
+                    extension = {
+                        'id': f"{ext.get('publisher', {}).get('publisherName', '')}.{ext.get('extensionName', '')}",
+                        'title': ext.get('displayName', ''),
+                        'publisher': ext.get('publisher', {}).get('displayName', ''),
+                        'description': ext.get('shortDescription', ''),
+                        'icon': icon_url,
+                        'installs': stats.get('install', 0),
+                        'rating': stats.get('averagerating', 0),
+                        'about_url': f"/about/{ext.get('publisher', {}).get('publisherName', '')}.{ext.get('extensionName', '')}"
+                    }
+                    extensions.append(extension)
+            
+            return {
+                'success': True,
+                'query': query,
+                'extensions': extensions,
+                'total': len(extensions)
+            }
+        else:
+            return {
+                'success': False,
+                'error': f'Failed to fetch extensions: {response.status_code}',
+                'query': query
+            }
+    except Exception as e:
+        return {
+            'success': False,
+            'error': str(e),
+            'query': query
+        }
+
 @app.route('/get_ext_list', methods=['POST'])
 def ext_list():
-    ext_name = request.get_json().get('extensionName')
-    resp = r.get(f"https://marketplace.visualstudio.com/search?term={ext_name}&target=VSCode&category=All%20categories&sortBy=Relevance")
-    data = resp.text
-    with open("resp.txt", 'x') as f:
-        f.write(data)
-    f.close()
-    data = data.split('<span class="item-title" data-bind="text: title">')
-    for i in range(0,len(data)):
-        data[i] = data[i].split("<")[0]
+    data = request.get_json()
+    extension_name = data.get('extensionName')
+    if not extension_name:
+        return jsonify({
+            'success': False,
+            'error': 'Extension name is required',
+            'query': None
+        })
     
-    return jsonify(data)
+    result = search_marketplace_extensions(extension_name)
+    return jsonify(result)
 
 @app.route('/')
 def home():
@@ -107,7 +205,11 @@ def home():
 def search_extension():
     data = request.get_json()
     extension_name = data.get('extensionName')
-    return jsonify({'message': f'Search for {extension_name} received.'})
+    if not extension_name:
+        return jsonify({'success': False, 'error': 'Extension name is required'})
+    
+    result = search_marketplace_extensions(extension_name)
+    return jsonify(result)
 
 @app.route('/about')
 def about():
