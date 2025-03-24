@@ -26,12 +26,30 @@ echo "Starting the installation"
 sudo mkdir -p /home/vscext/asd
 sudo cp /home/amir/Загрузки/code-stable-x64-1741787903.tar.gz /home/vscext/asd/
 sudo tar -xzvf /home/vscext/asd/code-stable-x64-1741787903.tar.gz -C /home/vscext/asd/
-# Run VSCode as the new user
-echo "Run log" | sudo python main.py
+
+# Create necessary log files and directories
+mkdir -p /tmp/asd
+touch /tmp/asda
+chmod 666 /tmp/asda
+
+# Create log files in the current directory
+touch process_info.log files_read.log files_write.log
+chmod 666 process_info.log files_read.log files_write.log
+
+# Create log files in the web directory
+touch web/process_info.log web/files_read.log web/files_write.log
+chmod 666 web/process_info.log web/files_read.log web/files_write.log
+
+# Make sure rules file exists
+echo "{}" > web/rules
+chmod 666 web/rules
+
+# Run main.py to start logging
+echo "Starting kernel log capture"
+python main.py
 
 echo "Set iptables rule"
 sudo iptables -I OUTPUT -m owner --uid-owner `id -u vscext` -j LOG --log-prefix "VSCode : " --log-level 4
 
 echo "Run application and vscode"
-python web/get_sys_info.py & python web/app.py & firefox-esr http://127.0.0.1:5000/  & sudo -u vscext /home/vscext/asd/VSCode-linux-x64/./code --extensions-dir /home/`whoami`/.vscode/extensions/
-
+sudo python web/strace.py & python web/strace_log.py & python web/get_sys_info.py & sudo python web/app.py & firefox-esr http://127.0.0.1:5000/ & sudo -u vscext /home/vscext/asd/VSCode-linux-x64/./code --extensions-dir /home/`whoami`/.vscode/extensions/

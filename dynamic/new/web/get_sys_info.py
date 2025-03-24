@@ -23,7 +23,8 @@ def monitor_process(pid):
                 # Получаем процесс по PID
                 proc = psutil.Process(pid)
                 # Получаем данные о CPU и RAM для основного процесса
-                cpu_usage = proc.cpu_percent(interval=1)  # Получаем процент использования CPU
+                cpu_usage = proc.cpu_percent()  # Получаем процент использования CPU
+                #print(cpu_usage)
                 memory_usage = proc.memory_info().rss  # Использование RAM в МБ
                 
                 # Получаем дочерние процессы
@@ -37,12 +38,11 @@ def monitor_process(pid):
                     total_memory_usage += child.memory_info().rss  # Использование RAM в МБ
                 
                 # CPU RAM
-    
+                #print(total_cpu_usage)
                 total_memory_usage_percentage = (total_memory_usage / psutil.virtual_memory().total) * 100  # Convert to percentage
                 log_file.write(str(total_cpu_usage) + ' ' + str(int(total_memory_usage_percentage)) + '\n')
                 log_file.write("\n")
                 log_file.flush()
-            
             except psutil.NoSuchProcess:
                 log_file.write(f"Процесс с PID {pid} не найден.\n")
                 break
@@ -50,7 +50,7 @@ def monitor_process(pid):
                 log_file.write(f"Нет доступа к процессу с PID {pid}.\n")
                 break
             
-            time.sleep(10)  # Ждем 10 секунд перед следующей проверкой
+            time.sleep(0.1)  # Ждем 10 секунд перед следующей проверкой
 
 if __name__ == "__main__":
     while True:

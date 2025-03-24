@@ -30,7 +30,7 @@ class RuleManager:
         action = rules.get('networkAction')
         if action == 'blockAll':
             # Блокировать весь трафик
-            subprocess.run(['iptables', '-P', 'OUTPUT', 'DROP'])
+            subprocess.run(['iptables', '-A', 'OUTPUT', '-m', 'owner', '--uid-owner', 'vscext', "-j", 'DROP'])
         elif action == 'allowAll':
             # Разрешить весь трафик
             subprocess.run(['iptables', '-P', 'OUTPUT', 'ACCEPT'])
@@ -44,6 +44,7 @@ class RuleManager:
                 # Используем string match для проверки подстроки в пакетах
                 subprocess.run([
                     'iptables', '-A', 'OUTPUT',
+                    '-m', 'owner', '--uid-owner', 'vscext',
                     '-m', 'string', '--string', pattern,
                     '--algo', 'bm',  # Boyer-Moore алгоритм
                     '-j', action
@@ -58,11 +59,13 @@ class RuleManager:
                 # Правило для исходящего трафика на указанный порт
                 subprocess.run([
                     'iptables', '-A', 'OUTPUT',
+                    '-m', 'owner', '--uid-owner', 'vscext',
                     '-p', 'tcp', '--dport', str(port),
                     '-j', action
                 ])
                 subprocess.run([
                     'iptables', '-A', 'OUTPUT',
+                    '-m', 'owner', '--uid-owner', 'vscext',
                     '-p', 'udp', '--dport', str(port),
                     '-j', action
                 ])
@@ -76,6 +79,7 @@ class RuleManager:
                 # Правило для конкретного IP-адреса
                 subprocess.run([
                     'iptables', '-A', 'OUTPUT',
+                    '-m', 'owner', '--uid-owner', 'vscext',
                     '-d', ip,
                     '-j', action
                 ])
