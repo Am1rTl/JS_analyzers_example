@@ -125,7 +125,7 @@ def search_marketplace_extensions(query):
     
     try:
         response = r.post(url, headers=headers, json=data)
-        print(response.text)
+        #print(response.text)
         
         if response.status_code == 200:
             results = response.json().get('results', [])
