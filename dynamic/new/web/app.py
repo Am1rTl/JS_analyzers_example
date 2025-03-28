@@ -9,9 +9,19 @@ from rule_manager import RuleManager
 app = Flask(__name__)
 
 def get_extensions_list():
-    result = subprocess.run(['code','--list-extensions'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    data = result.stdout
-    return data
+    try:
+        result = subprocess.run(['sudo', '-u', 'amir', 'code', '--list-extensions'], 
+                               stdout=subprocess.PIPE, 
+                               stderr=subprocess.PIPE, 
+                               text=True)
+        if result.returncode != 0:
+            print(f"Error getting extensions: {result.stderr}")
+            return "Error getting extensions list"
+        data = result.stdout
+        return data
+    except Exception as e:
+        print(f"Exception in get_extensions_list: {str(e)}")
+        return f"Error: {str(e)}"
 
 @lru_cache(maxsize=None)
 def get_ext_info(ext):
@@ -192,6 +202,7 @@ def ext_list():
 @app.route('/')
 def home():
     extensions = get_extensions_list()
+    print(extensions)
     extensions = extensions.split("\n")
     extensions_ret = {}
     for ext in extensions:

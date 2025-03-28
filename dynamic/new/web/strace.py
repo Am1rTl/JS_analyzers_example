@@ -22,7 +22,7 @@ def get_pid():
 def get_child_processes(pid):
     try:
         parent = psutil.Process(pid)
-        return parent.children(recursive=True)  # Получаем всех дочерних процессов
+        return parent.children(recursive=True)      
     except psutil.NoSuchProcess:
         return []
 
@@ -76,8 +76,9 @@ if __name__ == "__main__":
     while True:
         try:
             pid = get_pid()
-            print(f"PID получен, начинаю логирование процесса {pid}")
+            #print(f"PID получен, начинаю логирование процесса {pid}")
             monitor_strace_log(pid)
-        except ValueError:
-            print("Пожалуйста, введите корректный числовой PID.")
+        except:
+            continue
+            #print("Пожалуйста, введите корректный числовой PID.")
         time.sleep(10)
