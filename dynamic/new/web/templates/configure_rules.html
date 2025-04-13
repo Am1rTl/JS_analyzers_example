@@ -353,11 +353,19 @@
                     <!-- Фильтрация по порту -->
                     <div class="mb-6">
                         <h3 class="text-xl font-semibold mb-4 text-gray-800">Правила по порту:</h3>
+                        <div class="flex justify-between mb-4">
+                            <button id="blockPortButton" class="action-button active" onclick="toggleAction('blockPortButton', 'allowPortButton', 'block')">
+                                Блокировать всё с
+                            </button>
+                            <button id="allowPortButton" class="action-button inactive" onclick="toggleAction('allowPortButton', 'blockPortButton', 'allow')">
+                                Разрешить всё с
+                            </button>
+                        </div>
                         <div class="flex flex-col space-y-2">
                             <div class="flex space-x-2">
                                 <div class="flex-grow">
                                     <input type="number" id="portInput" 
-                                           class="w-full p-3 border rounded-lg transition-colors duration-200"
+                                           class="w-full p-3 border rounded-lg transition-colors duration-200 text-black"
                                            placeholder="Введите номер порта (1-65535)"
                                            min="1" max="65535"
                                            onkeydown="handleKeyDown(event, 'portInput', 'portList')"
@@ -367,12 +375,8 @@
                                         <span class="error-text">Порт должен быть числом от 1 до 65535</span>
                                     </div>
                                 </div>
-                                <button id="addPortButton" 
-                                        class="add-button action-button" 
-                                        onclick="addRule('port')" 
-                                        disabled>
-                                    <i class="fas fa-plus mr-2"></i>
-                                    Добавить
+                                <button onclick="addRule('port')" class="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition" id="addPortButton" disabled>
+                                    <i class="fas fa-plus"></i>
                                 </button>
                             </div>
                         </div>
