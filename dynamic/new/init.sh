@@ -29,6 +29,7 @@ sudo cp /home/amir/Загрузки/code-stable-x64-1741787903.tar.gz /home/vsce
 sudo tar -xzvf /home/vscext/asd/code-stable-x64-1741787903.tar.gz -C /home/vscext/asd/
 
 # Create necessary log files and directories
+sudo rm -rf /tmp/asd
 mkdir -p /tmp/asd
 touch /tmp/asda
 chmod 666 /tmp/asda

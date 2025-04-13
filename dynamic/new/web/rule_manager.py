@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 from typing import Dict, List, Optional
 
@@ -89,15 +90,50 @@ class RuleManager:
         read_action = rules.get('readAction')
         write_action = rules.get('writeAction')
         
-        # Применить правила чтения
-        if read_action == 'blockAll':
-            # Использовать AppArmor или SELinux для ограничения доступа
-            pass
+        # Получаем правила для файлов
+        files = rules.get('files', {})
+        write_files = rules.get('writeFiles', {})
         
-        # Применить правила записи
+        # Получаем имя пользователя из /home (исключая vscext)
+        home_users = [user for user in os.listdir('/home') if user != 'vscext']
+        if not home_users:
+            raise Exception("Не найден основной пользователь в /home")
+        user = home_users[0]
+        user_home = f'/home/{user}'
+        
+        # Применяем правила чтения
+        if read_action == 'blockAll':
+            # Блокируем все файлы для чтения
+            subprocess.run(['setfacl', '-R', '-m', 'u:vscext:---', user_home])
+        elif read_action == 'custom':
+            # Сначала блокируем все
+            subprocess.run(['setfacl', '-R', '-m', 'u:vscext:---', user_home])
+            # Затем разрешаем только выбранные
+            for file in files.get('values', []):
+                if files['activeAction'] == 'Разрешить всё с':
+                    subprocess.run(['setfacl', '-R', '-m', 'u:vscext:r-x', file])
+                else:
+                    subprocess.run(['setfacl', '-R', '-m', 'u:vscext:---', file])
+        elif read_action == 'allowAll':
+            # Разрешаем чтение всех файлов
+            subprocess.run(['setfacl', '-R', '-m', 'u:vscext:r-x', user_home])
+            
+        # Применяем правила записи
         if write_action == 'blockAll':
-            # Использовать AppArmor или SELinux для ограничения доступа
-            pass
+            # Блокируем все файлы для записи
+            subprocess.run(['setfacl', '-R', '-m', 'u:vscext:r-x', user_home])
+        elif write_action == 'custom':
+            # Сначала устанавливаем базовые права на чтение
+            subprocess.run(['setfacl', '-R', '-m', 'u:vscext:r-x', user_home])
+            # Затем обрабатываем правила для конкретных файлов
+            for file in write_files.get('values', []):
+                if write_files['activeAction'] == 'Разрешить всё с':
+                    subprocess.run(['setfacl', '-R', '-m', 'u:vscext:rwx', file])
+                else:
+                    subprocess.run(['setfacl', '-R', '-m', 'u:vscext:r-x', file])
+        elif write_action == 'allowAll':
+            # Разрешаем запись всех файлов
+            subprocess.run(['setfacl', '-R', '-m', 'u:vscext:rwx', user_home])
 
     def apply_resource_rules(self, rules: Dict):
         """Применяет правила использования ресурсов"""
@@ -110,6 +146,7 @@ class RuleManager:
     def apply_rules(self):
         """Применяет все правила из конфигурации"""
         rules = self.load_rules()
+        print("The rules are ", rules)
         self.apply_network_rules(rules)
         self.apply_file_rules(rules)
         self.apply_resource_rules(rules)
