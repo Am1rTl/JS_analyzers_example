@@ -76,9 +76,9 @@ if __name__ == "__main__":
     while True:
         try:
             pid = get_pid()
-            #print(f"PID получен, начинаю логирование процесса {pid}")
+            print(f"PID получен, начинаю логирование процесса {pid}")
             monitor_strace_log(pid)
         except:
             continue
-            #print("Пожалуйста, введите корректный числовой PID.")
+            print("Пожалуйста, введите корректный числовой PID.")
         time.sleep(10)

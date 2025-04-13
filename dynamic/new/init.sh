@@ -13,7 +13,8 @@ sudo mkdir -p /home/amir/.vscode/extensions
 #sudo chown -R vscext:vscext /home/amir/.vscode/
 sudo setfacl -d -m u:vscext:rwx /home/amir/.vscode/
 #sudo usermod -aG amir vscext
-setfacl -m u:vscext:rwx /home/amir
+sudo setfacl -R -m u:vscext:rwx /home/amir
+
 
 # Allow the new user to access the display
 xhost +SI:localuser:vscext

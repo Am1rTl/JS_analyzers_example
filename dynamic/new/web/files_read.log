@@ -1,6 +1,5 @@
-/usr/share/windsurf/resources.pak
-/usr/share/windsurf/chrome_200_percent.pak
-/home/amir/.config/Windsurf/Shared Dictionary/db
-/home/amir/.config/Windsurf/Trust Tokens
-/dev/shm/.org.chromium.Chromium.ZlXKuD (deleted)
-/usr/share/windsurf/locales/en-GB.pak
+/usr/lib/electron34/v8_context_snapshot.bin
+/dev/null
+/usr/lib/electron34/chrome_100_percent.pak
+/dev/shm/.org.chromium.Chromium.2mjI4O (deleted)
+/usr/lib/electron34/locales/en-US.pak

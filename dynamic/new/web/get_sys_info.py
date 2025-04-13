@@ -35,6 +35,8 @@ def monitor_process(pid):
                 # Суммируем показатели дочерних процессов
                 for child in child_procs:
                     total_cpu_usage += child.cpu_percent(interval=0)  # Получаем CPU дочернего процесса
+                    # Вывод информации о процессе
+                    #print(f"Process ID: {child.pid}, Name: {child.name()}, Memory Usage: {child.memory_info().rss} bytes")
                     total_memory_usage += child.memory_info().rss  # Использование RAM в МБ
                 
                 # CPU RAM
